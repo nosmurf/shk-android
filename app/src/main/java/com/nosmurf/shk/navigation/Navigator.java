@@ -16,4 +16,14 @@ public class Navigator {
     public Navigator() {
 
     }
+
+    public void navigateToCameraActivity(RootActivity activity, File photoFile, int requestImageCapture) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null && photoFile != null) {
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                    Uri.fromFile(photoFile));
+            activity.startActivityForResult(takePictureIntent, requestImageCapture);
+        }
+    }
+
 }
