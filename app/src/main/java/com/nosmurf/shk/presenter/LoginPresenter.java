@@ -1,15 +1,23 @@
 package com.nosmurf.shk.presenter;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.nosmurf.shk.view.activity.RootActivity;
 
 import javax.inject.Inject;
 
+import static com.nosmurf.shk.view.activity.LoginActivity.RC_SIGN_IN;
+
 public class LoginPresenter extends Presenter<LoginPresenter.View> {
+
+    private static final String TAG = "LoginPresenter";
 
     private GoogleApiClient googleApiClient;
 
@@ -43,6 +51,21 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     public void onSignInClick() {
         navigator.navigateToSignIngActivity(googleApiClient, ((RootActivity) view.getContext()));
 
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
+            if (result.isSuccess()) {
+                // Signed in successfully, show authenticated UI.
+                GoogleSignInAccount acct = result.getSignInAccount();
+
+                Log.i(TAG, "onActivityResult: " + acct.getDisplayName());
+            } else {
+                Log.e(TAG, "onActivityResult: " + result.getStatus().toString());
+            }
+        }
     }
 
     public interface View extends Presenter.View {

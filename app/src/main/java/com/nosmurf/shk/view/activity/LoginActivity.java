@@ -1,6 +1,7 @@
 package com.nosmurf.shk.view.activity;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.google.android.gms.common.SignInButton;
 import com.nosmurf.shk.R;
@@ -92,5 +93,10 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Override
     public Context getContext() {
         return this;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        loginPresenter.onActivityResult(requestCode, resultCode, data);
     }
 }
