@@ -94,6 +94,12 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        nfcPresenter.onResume();
+    }
+
+    @Override
     protected void initializeUI() {
 
     }

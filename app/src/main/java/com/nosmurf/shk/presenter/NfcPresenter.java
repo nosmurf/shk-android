@@ -52,6 +52,10 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
         // TODO: 01/12/2016
     }
 
+    public void onResume() {
+        adapter.enableForegroundDispatch(((RootActivity) view.getContext()), pendingIntent, filters, techListsArray);
+    }
+
     public interface View extends Presenter.View {
 
     }
