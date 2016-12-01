@@ -87,7 +87,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     public void showProgress(String message) {
         progress.setVisibility(View.VISIBLE);
         if (message != null) {
-            showSnacbar(message);
+            showSnackbar(message);
         }
     }
 
@@ -95,7 +95,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     public void showProgress(int messageId) {
         progress.setVisibility(View.VISIBLE);
         if (messageId != 0) {
-            showSnacbar(messageId);
+            showSnackbar(messageId);
         }
     }
 
@@ -106,19 +106,19 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Override
     public void showError(String message) {
-        showSnacbar(message);
+        showSnackbar(message);
     }
 
     @Override
     public void showError(int messageId) {
-        showSnacbar(messageId);
+        showSnackbar(messageId);
     }
 
-    private void showSnacbar(int messageId) {
+    private void showSnackbar(int messageId) {
         Snackbar.make(container, messageId, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void showSnacbar(String message) {
+    private void showSnackbar(String message) {
         Snackbar.make(container, message, Snackbar.LENGTH_SHORT).show();
     }
 
