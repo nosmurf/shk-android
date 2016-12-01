@@ -15,9 +15,20 @@
 
     <ImageView
         android:id="@+id/done"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/done_size"
+        android:layout_height="@dimen/done_size"
         android:layout_centerInParent="true"
-        android:src="@drawable/ic_done_black_128px" />
+        android:src="@drawable/ic_done_black_128px"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/continue_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progress"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"
+        android:text="@string/continue_text"
+        android:visibility="gone" />
 
 </RelativeLayout>
