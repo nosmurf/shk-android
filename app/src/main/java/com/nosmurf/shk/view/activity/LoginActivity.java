@@ -1,5 +1,8 @@
 package com.nosmurf.shk.view.activity;
 
+import android.content.Context;
+
+import com.google.android.gms.common.SignInButton;
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerLoginComponent;
 import com.nosmurf.shk.internal.di.component.LoginComponent;
@@ -9,11 +12,16 @@ import com.nosmurf.shk.presenter.Presenter;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
+
 public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     public static final String TAG = "LoginActivity";
 
     LoginComponent loginComponent;
+
+    @Bind(R.id.sign_in_button)
+    SignInButton signInButton;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -50,7 +58,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Override
     protected void registerListeners() {
-
+        signInButton.setOnClickListener(v -> loginPresenter.onSignInClick());
     }
 
     @Override
@@ -76,5 +84,10 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Override
     public void showError(int messageId) {
         // TODO: 23/11/2016
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }
