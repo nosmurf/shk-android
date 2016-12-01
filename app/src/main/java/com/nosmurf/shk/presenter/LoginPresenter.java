@@ -9,10 +9,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.nosmurf.domain.usecase.DoLoginUseCase;
+import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.view.activity.RootActivity;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import static com.nosmurf.shk.view.activity.LoginActivity.RC_SIGN_IN;
 
@@ -22,9 +25,11 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
     private GoogleApiClient googleApiClient;
 
+    private DoLoginUseCase doLoginUseCase;
+
     @Inject
-    public LoginPresenter() {
-        super();
+    public LoginPresenter(@Named("doLoginUseCase") UseCase doLoginUseCase) {
+        this.doLoginUseCase = (DoLoginUseCase) doLoginUseCase;
     }
 
     @Override
@@ -60,9 +65,19 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
             if (result.isSuccess()) {
-                GoogleSignInAccount acct = result.getSignInAccount();
+                GoogleSignInAccount account = result.getSignInAccount();
+                doLoginUseCase.execute(account, new PresenterSubscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.i(TAG, "onNext: ");
+                    }
 
-                Log.i(TAG, "onActivityResult: " + acct.getDisplayName());
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        // Nothing to do
+                    }
+                });
+
             } else {
                 Log.e(TAG, "onActivityResult: " + result.getStatus().toString());
             }
