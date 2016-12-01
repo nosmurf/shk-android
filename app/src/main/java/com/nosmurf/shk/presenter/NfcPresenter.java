@@ -32,7 +32,7 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     @Inject
     public NfcPresenter() {
         super();
-        this.sectorIndex = 3; // FIXME: 01/12/2016 put it random please
+        this.sectorIndex = 3; // FIXME: 01/12/2016 please, remove hardcoded value
     }
 
 
@@ -69,10 +69,9 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
 
         try {
             mifareClassic.connect();
-            // 19 72 5d 85 51 31
+            // 19 72 5d 85 51 31 // FIXME: 01/12/2016 please, remove hardcoded key
             byte keyA[] = {(byte) 0x19, (byte) 0x72, (byte) 0x5d, (byte) 0x85, (byte) 0x51, (byte) 0x31};
 
-            sectorIndex = 1;
             if (mifareClassic.authenticateSectorWithKeyA(sectorIndex, keyA)) {
                 view.hideProgress();
             } else {
