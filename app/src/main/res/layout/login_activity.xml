@@ -30,12 +30,12 @@
         android:id="@+id/continue_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="46dp"
-        android:text="@string/continue_text"
-        android:visibility="visible"
-        android:backgroundTint="@color/light_green_500"
-        android:textColor="@color/white"
         android:layout_below="@+id/sign_in_button"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="46dp"
+        android:backgroundTint="@color/light_green_700"
+        android:text="@string/continue_text"
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 </RelativeLayout>
