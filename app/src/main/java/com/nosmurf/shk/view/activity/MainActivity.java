@@ -1,5 +1,6 @@
 package com.nosmurf.shk.view.activity;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 
 import com.nosmurf.shk.R;
@@ -63,7 +64,7 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @OnClick(R.id.camera)
     void takeAPhoto() {
-        mainPresenter.takeAPhoto();
+        mainPresenter.takeAPhoto(REQUEST_IMAGE_CAPTURE);
     }
 
     @Override
@@ -89,5 +90,12 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     public void showError(int messageId) {
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mainPresenter.decodeImageAndShow();
+        }
     }
 }
