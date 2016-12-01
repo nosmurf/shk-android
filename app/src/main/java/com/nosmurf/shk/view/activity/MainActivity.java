@@ -29,7 +29,7 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Override
     public int getLayoutId() {
-        return R.layout.main_activity_layout;
+        return R.layout.main_activity;
     }
 
     @Override

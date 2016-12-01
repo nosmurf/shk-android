@@ -15,8 +15,25 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
 
+    StorageReference storageReference;
+
     @Inject
     public SHKFirebaseDataSource() {
+        storageReference = FirebaseStorage.getInstance().getReference();
+    }
 
+    @Override
+    public Observable<Boolean> uploadPhoto(String imagePath) {
+        File image = new File(imagePath);
+        Uri uri = Uri.fromFile(image);
+        final StorageReference userPhotosRef = storageReference.child("photos").child(uri.getLastPathSegment());
+        return Observable.create(subscriber -> {
+            userPhotosRef.putFile(uri)
+                    .addOnSuccessListener(task -> {
+                        subscriber.onNext(true);
+                        subscriber.onCompleted();
+                    })
+                    .addOnFailureListener(subscriber::onError);
+        });
     }
 }
