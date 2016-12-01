@@ -13,6 +13,7 @@ import rx.Subscriber;
 public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
+
     private final FirebaseAuth firebaseAuth;
 
     @Inject
