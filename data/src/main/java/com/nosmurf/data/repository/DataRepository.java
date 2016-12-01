@@ -7,6 +7,7 @@ import com.nosmurf.domain.repository.Repository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import model.TokenHashed;
 import rx.Observable;
 
 @Singleton
@@ -22,5 +23,10 @@ public class DataRepository implements Repository {
     @Override
     public Observable<Void> doLogin(GoogleSignInAccount account) {
         return firebaseDataSource.doLogin(account);
+    }
+
+    @Override
+    public Observable<TokenHashed> getHashedToken() {
+        return null;
     }
 }
