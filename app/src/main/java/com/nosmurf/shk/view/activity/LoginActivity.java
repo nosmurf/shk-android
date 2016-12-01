@@ -115,11 +115,11 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     }
 
     private void showSnacbar(int messageId) {
-        Snackbar.make(container, messageId, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(container, messageId, Snackbar.LENGTH_SHORT).show();
     }
 
     private void showSnacbar(String message) {
-        Snackbar.make(container, message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(container, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
