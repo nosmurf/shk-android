@@ -2,6 +2,7 @@ package com.nosmurf.shk.presenter;
 
 import android.util.Log;
 
+import com.nosmurf.domain.usecase.UploadPhotoUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.exception.ExceptionManager;
 import com.nosmurf.shk.utils.FileUtils;
@@ -13,16 +14,17 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import rx.Subscriber;
+
 public class MainPresenter extends Presenter<MainPresenter.View> {
 
-    private final UseCase uploadPhotoUseCase;
+    private final UploadPhotoUseCase uploadPhotoUseCase;
 
     private String photoPath;
 
-
     @Inject
     public MainPresenter(@Named("uploadPhotoUseCase") UseCase uploadPhotoUseCase) {
-        this.uploadPhotoUseCase = uploadPhotoUseCase;
+        this.uploadPhotoUseCase = (UploadPhotoUseCase) uploadPhotoUseCase;
     }
 
     @Override
@@ -47,10 +49,31 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     public void decodeImageAndShow() {
         Log.i("Photo", photoPath);
+        uploadPhotoUseCase.execute(photoPath, new UploadPhotoSubscriber());
     }
 
     public interface View extends Presenter.View {
 
+    }
+
+    private class UploadPhotoSubscriber extends Subscriber<Boolean> {
+
+        boolean result;
+
+        @Override
+        public void onCompleted() {
+            view.hideProgress();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            view.showError(ExceptionManager.convert((Exception) e));
+        }
+
+        @Override
+        public void onNext(Boolean aBoolean) {
+            result = aBoolean;
+        }
     }
 
 }
