@@ -7,7 +7,10 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 
+import com.nosmurf.shk.R;
 import com.nosmurf.shk.view.activity.RootActivity;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -24,10 +27,12 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     private IntentFilter[] filters;
 
     private String[][] techListsArray;
+    private int sectorIndex;
 
     @Inject
     public NfcPresenter() {
         super();
+        this.sectorIndex = 3; // FIXME: 01/12/2016 put it random please
     }
 
 
@@ -58,7 +63,27 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     }
 
     public void onNewTagDetected(Intent intent) {
+        view.showProgress(R.string.tag_detected);
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        MifareClassic mifareClassic = MifareClassic.get(tag);
+
+        try {
+            mifareClassic.connect();
+            // 19 72 5d 85 51 31
+            byte keyA[] = {(byte) 0x19, (byte) 0x72, (byte) 0x5d, (byte) 0x85, (byte) 0x51, (byte) 0x31};
+
+            sectorIndex = 1;
+            if (mifareClassic.authenticateSectorWithKeyA(sectorIndex, keyA)) {
+                view.hideProgress();
+            } else {
+                view.hideProgress();
+                view.showError(R.string.error_auth);
+            }
+        } catch (IOException e) {
+            view.hideProgress();
+            view.showError(R.string.error_reading_tag);
+        }
+
     }
 
     public interface View extends Presenter.View {
