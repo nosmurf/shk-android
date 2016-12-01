@@ -7,5 +7,5 @@ import com.google.firebase.auth.AuthResult;
 import rx.Observable;
 
 public interface FirebaseDataSource {
-    Observable<Boolean> doLogin(GoogleSignInAccount account);
+    Observable<Void> doLogin(GoogleSignInAccount account);
 }

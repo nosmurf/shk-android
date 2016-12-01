@@ -7,5 +7,5 @@ import rx.Observable;
 
 public interface Repository {
 
-    Observable<Boolean> doLogin(GoogleSignInAccount account);
+    Observable<Void> doLogin(GoogleSignInAccount account);
 }

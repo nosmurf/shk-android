@@ -25,7 +25,7 @@ public class DoLoginUseCase extends UseCase {
         this.repository = repository;
     }
 
-    public void execute(GoogleSignInAccount account, Subscriber<Boolean> subscriber){
+    public void execute(GoogleSignInAccount account, Subscriber<Void> subscriber){
         this.account = account;
 
         super.execute(subscriber);

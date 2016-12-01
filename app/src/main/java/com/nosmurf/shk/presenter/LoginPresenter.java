@@ -66,14 +66,14 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
-                doLoginUseCase.execute(account, new PresenterSubscriber<Boolean>() {
+                doLoginUseCase.execute(account, new PresenterSubscriber<Void>() {
                     @Override
                     public void onCompleted() {
-                        Log.i(TAG, "onNext: ");
+                        view.hideProgress();
                     }
 
                     @Override
-                    public void onNext(Boolean aBoolean) {
+                    public void onNext(Void aVoid) {
                         // Nothing to do
                     }
                 });

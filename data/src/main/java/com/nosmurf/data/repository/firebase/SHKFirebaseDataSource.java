@@ -22,15 +22,14 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Boolean> doLogin(GoogleSignInAccount account) {
-        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+    public Observable<Void> doLogin(GoogleSignInAccount account) {
+        return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
+            public void call(Subscriber<? super Void> subscriber) {
                 AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
                 firebaseAuth.signInWithCredential(credential)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                subscriber.onNext(true);
                                 subscriber.onCompleted();
                             } else {
                                 subscriber.onError(task.getException());

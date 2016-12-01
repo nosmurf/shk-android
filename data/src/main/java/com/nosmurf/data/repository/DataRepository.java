@@ -20,7 +20,7 @@ public class DataRepository implements Repository {
     }
 
     @Override
-    public Observable<Boolean> doLogin(GoogleSignInAccount account) {
+    public Observable<Void> doLogin(GoogleSignInAccount account) {
         return firebaseDataSource.doLogin(account);
     }
 }
