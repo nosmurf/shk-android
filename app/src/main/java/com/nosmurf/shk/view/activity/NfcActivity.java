@@ -1,13 +1,21 @@
 package com.nosmurf.shk.view.activity;
 
+import com.nosmurf.shk.internal.di.component.DaggerNfcComponent;
+import com.nosmurf.shk.internal.di.component.NfcComponent;
+import com.nosmurf.shk.internal.di.module.NfcModule;
 import com.nosmurf.shk.presenter.NfcPresenter;
 import com.nosmurf.shk.presenter.Presenter;
+
+import javax.inject.Inject;
 
 /**
  * Created by Sergio on 01/12/2016.
  */
 
 public class NfcActivity extends RootActivity implements NfcPresenter.View {
+    @Inject
+    NfcPresenter nfcPresenter;
+
     @Override
     public void showProgress(String message) {
 
@@ -40,12 +48,18 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Override
     public Presenter getPresenter() {
-        return null;
+        return nfcPresenter;
     }
 
     @Override
     protected void initializeInjector() {
+        NfcComponent nfcComponent = DaggerNfcComponent
+                .builder()
+                .appComponent(getAppComponent())
+                .nfcModule(new NfcModule())
+                .build();
 
+        nfcComponent.inject(this);
     }
 
     @Override
@@ -55,7 +69,7 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Override
     protected void initializePresenter() {
-
+        nfcPresenter.start(this);
     }
 
     @Override
