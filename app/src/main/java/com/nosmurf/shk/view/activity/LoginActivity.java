@@ -97,6 +97,6 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        loginPresenter.onActivityResult(requestCode, resultCode, data);
+        loginPresenter.onActivityResult(requestCode, data);
     }
 }
