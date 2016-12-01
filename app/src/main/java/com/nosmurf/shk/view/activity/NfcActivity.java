@@ -1,5 +1,6 @@
 package com.nosmurf.shk.view.activity;
 
+import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerNfcComponent;
 import com.nosmurf.shk.internal.di.component.NfcComponent;
 import com.nosmurf.shk.internal.di.module.NfcModule;
@@ -43,7 +44,7 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Override
     public int getLayoutId() {
-        return 0;
+        return R.layout.activity_nfc;
     }
 
     @Override
