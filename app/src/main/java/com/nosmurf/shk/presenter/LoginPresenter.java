@@ -60,7 +60,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
             if (result.isSuccess()) {
-                // Signed in successfully, show authenticated UI.
                 GoogleSignInAccount acct = result.getSignInAccount();
 
                 Log.i(TAG, "onActivityResult: " + acct.getDisplayName());
