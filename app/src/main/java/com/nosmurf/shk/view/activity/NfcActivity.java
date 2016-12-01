@@ -1,5 +1,6 @@
 package com.nosmurf.shk.view.activity;
 
+import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
@@ -64,6 +65,11 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     @Override
     public void showError(int messageId) {
         Snackbar.make(container, messageId, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 
     @Override
