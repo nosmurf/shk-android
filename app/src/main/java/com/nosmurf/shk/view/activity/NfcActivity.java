@@ -99,6 +99,6 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Override
     protected void registerListeners() {
-
+        continueButton.setOnClickListener(v -> nfcPresenter.onContinueClick());
     }
 }

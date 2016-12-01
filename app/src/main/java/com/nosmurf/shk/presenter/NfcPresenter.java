@@ -16,12 +16,16 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
 
     @Override
     protected void initialize() {
-
+        // TODO: 01/12/2016
     }
 
     @Override
     public void destroy() {
+        // TODO: 01/12/2016
+    }
 
+    public void onContinueClick() {
+        // TODO: 01/12/2016
     }
 
     public interface View extends Presenter.View {
