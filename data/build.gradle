@@ -43,7 +43,10 @@ dependencies {
     compile dataDependencies.gsonRetrofit
     compile dataDependencies.rxRetrofit
     compile dataDependencies.gson
+
     compile dataDependencies.firebaseStorage
+    compile dataDependencies.firebaseAuth
+    compile dataDependencies.playServices
 
     androidTestCompile dataTestDependencies.testingSupportLib
     testCompile dataTestDependencies.junit

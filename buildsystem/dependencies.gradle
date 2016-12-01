@@ -78,7 +78,9 @@ ext {
             gsonRetrofit   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
             rxRetrofit     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
             retroLambda    : "${retroLambda}",
-            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}"
+            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}",
+            firebaseAuth   : "com.google.firebase:firebase-auth:${firebaseVersion}",
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
     ]
 
     dataTestDependencies = [
