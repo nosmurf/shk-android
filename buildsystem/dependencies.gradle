@@ -50,7 +50,9 @@ ext {
             rxAndroid      : "io.reactivex:rxandroid:${rxAndroidVersion}",
             javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
             rxFingerPrint  : "com.mtramin:rxfingerprint:${rxFingerPrintVersion}",
-            retroLambda    : "${retroLambda}"
+            retroLambda    : "${retroLambda}",
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
+
     ]
 
     appTestDependencies = [
@@ -79,8 +81,7 @@ ext {
             rxRetrofit     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
             retroLambda    : "${retroLambda}",
             firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}",
-            firebaseAuth   : "com.google.firebase:firebase-auth:${firebaseVersion}",
-            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
+            firebaseAuth   : "com.google.firebase:firebase-auth:${firebaseVersion}"
     ]
 
     dataTestDependencies = [
