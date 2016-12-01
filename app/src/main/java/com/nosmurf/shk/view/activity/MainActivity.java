@@ -1,5 +1,7 @@
 package com.nosmurf.shk.view.activity;
 
+import android.content.Context;
+
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerMainComponent;
 import com.nosmurf.shk.internal.di.component.MainComponent;
@@ -74,5 +76,10 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     public void showError(int messageId) {
 
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }

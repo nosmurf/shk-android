@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.nosmurf.shk.R;
 import com.nosmurf.shk.view.activity.RootActivity;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     public void initialize() {
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(view.getContext().getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
 
