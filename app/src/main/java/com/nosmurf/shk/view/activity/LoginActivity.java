@@ -2,6 +2,12 @@ package com.nosmurf.shk.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.ContentLoadingProgressBar;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.SignInButton;
 import com.nosmurf.shk.R;
@@ -24,8 +30,20 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     LoginComponent loginComponent;
 
+    @Bind(R.id.container)
+    RelativeLayout container;
+
     @Bind(R.id.sign_in_button)
     SignInButton signInButton;
+
+    @Bind(R.id.progress)
+    ContentLoadingProgressBar progress;
+
+    @Bind(R.id.done)
+    ImageView done;
+
+    @Bind(R.id.continue_button)
+    Button continueButton;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -67,27 +85,41 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Override
     public void showProgress(String message) {
-        // TODO: 23/11/2016
+        progress.setVisibility(View.VISIBLE);
+        if (message != null) {
+            showSnacbar(message);
+        }
     }
 
     @Override
     public void showProgress(int messageId) {
-        // TODO: 23/11/2016
+        progress.setVisibility(View.VISIBLE);
+        if (messageId != 0) {
+            showSnacbar(messageId);
+        }
     }
 
     @Override
     public void hideProgress() {
-        // TODO: 23/11/2016
+        progress.setVisibility(View.GONE);
     }
 
     @Override
     public void showError(String message) {
-        // TODO: 23/11/2016
+        showSnacbar(message);
     }
 
     @Override
     public void showError(int messageId) {
-        // TODO: 23/11/2016
+        showSnacbar(messageId);
+    }
+
+    private void showSnacbar(int messageId) {
+        Snackbar.make(container, messageId, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void showSnacbar(String message) {
+        Snackbar.make(container, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -98,5 +130,17 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         loginPresenter.onActivityResult(requestCode, data);
+    }
+
+    @Override
+    public void showCompletedUI() {
+        hideProgress();
+        done.setVisibility(View.VISIBLE);
+        continueButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void toggleSignInButton(boolean show) {
+        signInButton.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 }

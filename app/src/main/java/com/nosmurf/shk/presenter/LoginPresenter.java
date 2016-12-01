@@ -2,7 +2,6 @@ package com.nosmurf.shk.presenter;
 
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -44,7 +43,9 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
         googleApiClient = new GoogleApiClient.Builder(context)
                 .enableAutoManage(context, connectionResult -> {
                     // TODO: 01/12/2016 change hardcoded string
-                    view.showError("Fail");
+                    view.hideProgress();
+                    view.showError(R.string.google_signin_error);
+                    view.toggleSignInButton(true);
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
                 .build();
@@ -56,6 +57,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     }
 
     public void onSignInClick() {
+        view.showProgress(R.string.loging);
+        view.toggleSignInButton(false);
         navigator.navigateToSignIngActivity(googleApiClient, ((RootActivity) view.getContext()));
 
     }
@@ -70,6 +73,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
                     @Override
                     public void onCompleted() {
                         view.hideProgress();
+                        view.showCompletedUI();
                     }
 
                     @Override
@@ -79,12 +83,14 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
                 });
 
             } else {
-                Log.e(TAG, "onActivityResult: " + result.getStatus().toString());
+                view.showError(R.string.google_signin_error);
             }
         }
     }
 
     public interface View extends Presenter.View {
+        void showCompletedUI();
 
+        void toggleSignInButton(boolean show);
     }
 }
