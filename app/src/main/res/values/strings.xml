@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">Security Home Key</string>
+
+
+    <!-- Exception Messages -->
+    <string name="exception_message_generic">There was an application error</string>
+
+</resources>

@@ -1,0 +1,93 @@
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+ext {
+    //Android
+    androidBuildToolsVersion = "24.0.1"
+    androidMinSdkVersion = 21
+    androidTargetSdkVersion = 24
+    androidCompileSdkVersion = 24
+
+    //Android Libs
+    appcompatVersion = '24.2.0'
+
+    //Libraries
+    daggerVersion = '2.7'
+    butterKnifeVersion = '7.0.1'
+    rxJava2Version = '2.0.1'
+    rxJavaVersion = '1.2.2'
+    rxAndroidVersion = '1.2.1'
+    javaxAnnotationVersion = '1.0'
+    javaxInjectVersion = '1'
+    retrofitVersion = '2.1.0'
+    gsonVersion = '2.7'
+    rxFingerPrintVersion = '2.0.0'
+    firebaseVersion = '9.6.1'
+
+    //RetroLambda
+    retroLambda = 'me.tatarka.retrolambda'
+
+    //Test
+    espressoVersion = '2.0'
+    testingSupportLibVersion = '0.1'
+    jUnitVersion = '4.12'
+    mockitoVersion = '2.2.7'
+    assertJVersion = '3.5.2'
+
+    appDependencies = [
+            support        : "com.android.support:support-v13:${appcompatVersion}",
+            appcompat      : "com.android.support:appcompat-v7:${appcompatVersion}",
+            design         : "com.android.support:design:${appcompatVersion}",
+            recycler       : "com.android.support:recyclerview-v7:${appcompatVersion}",
+            rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
+            rxJava2        : "io.reactivex.rxjava2:rxjava:${rxJava2Version}",
+            daggerCompiler : "com.google.dagger:dagger-compiler:${daggerVersion}",
+            dagger         : "com.google.dagger:dagger:${daggerVersion}",
+            butterKnife    : "com.jakewharton:butterknife:${butterKnifeVersion}",
+            rxAndroid      : "io.reactivex:rxandroid:${rxAndroidVersion}",
+            javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
+            rxFingerPrint  : "com.mtramin:rxfingerprint:${rxFingerPrintVersion}",
+            retroLambda    : "${retroLambda}"
+    ]
+
+    appTestDependencies = [
+            junit            : "junit:junit:${jUnitVersion}",
+            espresso         : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
+            testingSupportLib: "com.android.support.test:testing-support-lib:${testingSupportLibVersion}"
+    ]
+
+    domainDependencies = [
+            rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
+            javaxInject    : "javax.inject:javax.inject:${javaxInjectVersion}",
+            javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
+            retroLambda    : "${retroLambda}"
+    ]
+
+    domainTestDependencies = [
+            junit  : "junit:junit:${jUnitVersion}",
+            mockito: "org.mockito:mockito-core:${mockitoVersion}"
+    ]
+
+    dataDependencies = [
+            rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
+            gson           : "com.google.code.gson:gson:${gsonVersion}",
+            retrofit       : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+            gsonRetrofit   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
+            rxRetrofit     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+            retroLambda    : "${retroLambda}",
+            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}"
+    ]
+
+    dataTestDependencies = [
+            junit            : "junit:junit:${jUnitVersion}",
+            assertj          : "org.assertj:assertj-core:${assertJVersion}",
+            mockito          : "org.mockito:mockito-core:${mockitoVersion}",
+            testingSupportLib: "com.android.support.test:testing-support-lib:${testingSupportLibVersion}"
+
+    ]
+
+
+}
