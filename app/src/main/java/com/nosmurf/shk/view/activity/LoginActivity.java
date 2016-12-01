@@ -52,7 +52,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Override
     public int getLayoutId() {
-        return R.layout.login_activity;
+        return R.layout.activity_login;
     }
 
     @Override
