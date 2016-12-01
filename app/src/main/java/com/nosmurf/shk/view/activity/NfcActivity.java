@@ -41,6 +41,10 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     @Inject
     NfcPresenter nfcPresenter;
 
+    public static Intent getCallingIntent(Context context) {
+        return new Intent(context, NfcActivity.class);
+    }
+
     @Override
     public void showProgress(String message) {
         progress.setVisibility(View.VISIBLE);

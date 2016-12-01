@@ -88,6 +88,10 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
         }
     }
 
+    public void onContinueClick() {
+        navigator.navigateToNfcActivity(view.getContext());
+    }
+
     public interface View extends Presenter.View {
         void showCompletedUI();
 
