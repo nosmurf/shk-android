@@ -4,6 +4,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.nosmurf.domain.model.TokenHashed;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +12,6 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
-import model.TokenHashed;
 import rx.Observable;
 import rx.Subscriber;
 

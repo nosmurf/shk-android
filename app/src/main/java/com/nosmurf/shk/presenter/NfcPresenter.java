@@ -7,18 +7,25 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 
+import com.nosmurf.domain.model.TokenHashed;
+import com.nosmurf.domain.usecase.GetHashedAuthTokenUseCase;
+import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.R;
+import com.nosmurf.shk.view.activity.NfcActivity;
 import com.nosmurf.shk.view.activity.RootActivity;
 
 import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Created by Sergio on 01/12/2016.
  */
 
 public class NfcPresenter extends Presenter<NfcPresenter.View> {
+
+    private final GetHashedAuthTokenUseCase getHashedAuthTokenUseCase;
 
     private NfcAdapter adapter;
 
@@ -27,11 +34,14 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     private IntentFilter[] filters;
 
     private String[][] techListsArray;
+
     private int sectorIndex;
 
+    private MifareClassic mifareClassic;
+
     @Inject
-    public NfcPresenter() {
-        super();
+    public NfcPresenter(@Named("getHashedTokenUseCase") UseCase getHashedAuthTokenUseCase) {
+        this.getHashedAuthTokenUseCase = (GetHashedAuthTokenUseCase) getHashedAuthTokenUseCase;
         this.sectorIndex = 3; // FIXME: 01/12/2016 please, remove hardcoded value
     }
 
@@ -40,7 +50,7 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     protected void initialize() {
         adapter = NfcAdapter.getDefaultAdapter(view.getContext());
 
-        RootActivity activity = (RootActivity) view.getContext();
+        RootActivity activity = (NfcActivity) view.getContext();
 
         pendingIntent = PendingIntent.getActivity(activity, 0,
                 new Intent(activity, activity.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
@@ -59,13 +69,13 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     }
 
     public void onResume() {
-        adapter.enableForegroundDispatch(((RootActivity) view.getContext()), pendingIntent, filters, techListsArray);
+        adapter.enableForegroundDispatch(((NfcActivity) view.getContext()), pendingIntent, filters, techListsArray);
     }
 
     public void onNewTagDetected(Intent intent) {
         view.showProgress(R.string.tag_detected);
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        MifareClassic mifareClassic = MifareClassic.get(tag);
+        mifareClassic = MifareClassic.get(tag);
 
         try {
             mifareClassic.connect();
@@ -73,7 +83,18 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
             byte keyA[] = {(byte) 0x19, (byte) 0x72, (byte) 0x5d, (byte) 0x85, (byte) 0x51, (byte) 0x31};
 
             if (mifareClassic.authenticateSectorWithKeyA(sectorIndex, keyA)) {
-                view.hideProgress();
+                getHashedAuthTokenUseCase.execute(new PresenterSubscriber<TokenHashed>() {
+                    @Override
+                    public void onCompleted() {
+                        view.hideProgress();
+                        view.showError("jaja funsiona");
+                    }
+
+                    @Override
+                    public void onNext(TokenHashed tokenHashed) {
+                        writeTag(tokenHashed);
+                    }
+                });
             } else {
                 view.hideProgress();
                 view.showError(R.string.error_auth);
@@ -83,6 +104,15 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
             view.showError(R.string.error_reading_tag);
         }
 
+    }
+
+    private void writeTag(TokenHashed tokenHashed) {
+        try {
+            mifareClassic.writeBlock(tokenHashed.getBlock(), tokenHashed.getHash());
+        } catch (IOException e) {
+            view.hideProgress();
+            view.showError(R.string.error_writing_tag);
+        }
     }
 
     public interface View extends Presenter.View {

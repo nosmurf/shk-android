@@ -12,5 +12,6 @@
     <string name="tag_detected">Tag detected, encrypting...</string>
     <string name="error_reading_tag">Error when reading tag</string>
     <string name="error_auth">Error on auth with tag</string>
+    <string name="error_writing_tag">Error when writing tag</string>
 
 </resources>
