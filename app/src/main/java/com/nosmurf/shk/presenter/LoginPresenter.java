@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.nosmurf.shk.view.activity.RootActivity;
 
 import javax.inject.Inject;
 
@@ -40,7 +41,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     }
 
     public void onSignInClick() {
-
+        navigator.navigateToSignIngActivity(googleApiClient, ((RootActivity) view.getContext()));
 
     }
 
