@@ -1,6 +1,7 @@
 package com.nosmurf.shk.view.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 
 import com.nosmurf.shk.R;
@@ -95,7 +96,12 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            mainPresenter.decodeImageAndShow();
+            mainPresenter.showAndUploadPhoto();
         }
+    }
+
+    @Override
+    public void showImage(Bitmap bitmap) {
+        // TODO: 01/12/2016 Show Photo 
     }
 }

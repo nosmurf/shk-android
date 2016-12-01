@@ -1,6 +1,7 @@
 package com.nosmurf.shk.presenter;
 
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.nosmurf.domain.usecase.UploadPhotoUseCase;
 import com.nosmurf.domain.usecase.UseCase;
@@ -47,13 +48,15 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         }
     }
 
-    public void decodeImageAndShow() {
-        Log.i("Photo", photoPath);
+    public void showAndUploadPhoto() {
+        // TODO: 01/12/2016 Notify to the view the photo.
+        Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
+        view.showImage(bitmap);
         uploadPhotoUseCase.execute(photoPath, new UploadPhotoSubscriber());
     }
 
     public interface View extends Presenter.View {
-
+        void showImage(Bitmap bitmap);
     }
 
     private class UploadPhotoSubscriber extends Subscriber<Boolean> {

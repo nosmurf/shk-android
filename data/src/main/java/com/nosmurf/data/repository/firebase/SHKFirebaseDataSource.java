@@ -26,6 +26,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     public Observable<Boolean> uploadPhoto(String imagePath) {
         File image = new File(imagePath);
         Uri uri = Uri.fromFile(image);
+        // TODO: 01/12/2016 Change "photos" to USER ID
         final StorageReference userPhotosRef = storageReference.child("photos").child(uri.getLastPathSegment());
         return Observable.create(subscriber -> {
             userPhotosRef.putFile(uri)
