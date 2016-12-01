@@ -20,20 +20,22 @@
         android:src="@drawable/ic_done_black_128px"
         android:visibility="gone" />
 
-    <Button
-        android:id="@+id/continue_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/progress"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
-        android:text="@string/continue_text"
-        android:visibility="gone" />
-
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
+
+    <Button
+        android:id="@+id/continue_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="46dp"
+        android:text="@string/continue_text"
+        android:visibility="visible"
+        android:backgroundTint="@color/light_green_500"
+        android:textColor="@color/white"
+        android:layout_below="@+id/sign_in_button"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

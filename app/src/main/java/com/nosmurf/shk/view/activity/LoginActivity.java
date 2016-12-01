@@ -3,6 +3,7 @@ package com.nosmurf.shk.view.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.Button;
@@ -137,6 +138,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
         hideProgress();
         done.setVisibility(View.VISIBLE);
         continueButton.setVisibility(View.VISIBLE);
+        container.setBackgroundColor(ContextCompat.getColor(this, R.color.light_green_500));
     }
 
     @Override
