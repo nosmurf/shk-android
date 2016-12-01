@@ -1,11 +1,17 @@
 package com.nosmurf.shk.presenter;
 
+import com.nosmurf.domain.usecase.UseCase;
+
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class MainPresenter extends Presenter<MainPresenter.View> {
 
+    private final UseCase uploadPhotoUseCase;
+
     @Inject
-    public MainPresenter() {
+    public MainPresenter(@Named("uploadPhotoUseCase") UseCase uploadPhotoUseCase) {
+        this.uploadPhotoUseCase = uploadPhotoUseCase;
     }
 
     @Override
@@ -22,9 +28,10 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     }
 
-
     public interface View extends Presenter.View {
 
     }
+
+
 
 }

@@ -6,6 +6,8 @@ import com.nosmurf.domain.repository.Repository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Observable;
+
 @Singleton
 public class DataRepository implements Repository {
 
@@ -18,7 +20,7 @@ public class DataRepository implements Repository {
 
 
     @Override
-    public void uploadPhoto(String imagePath) {
-        firebaseDataSource.uploadPhoto(imagePath);
+    public Observable<Boolean> uploadPhoto(String imagePath) {
+        return firebaseDataSource.uploadPhoto(imagePath);
     }
 }
