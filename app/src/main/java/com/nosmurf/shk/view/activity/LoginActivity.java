@@ -2,6 +2,7 @@ package com.nosmurf.shk.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
@@ -138,7 +139,10 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
         hideProgress();
         done.setVisibility(View.VISIBLE);
         continueButton.setVisibility(View.VISIBLE);
-        container.setBackgroundColor(ContextCompat.getColor(this, R.color.light_green_500));
+        int green = ContextCompat.getColor(this, R.color.light_green_500);
+        container.setBackgroundColor(green);
+
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(green));
     }
 
     @Override
