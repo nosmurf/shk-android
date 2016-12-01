@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 
 import com.nosmurf.shk.view.activity.RootActivity;
@@ -54,6 +55,10 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
 
     public void onResume() {
         adapter.enableForegroundDispatch(((RootActivity) view.getContext()), pendingIntent, filters, techListsArray);
+    }
+
+    public void onNewTagDetected(Intent intent) {
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
     }
 
     public interface View extends Presenter.View {

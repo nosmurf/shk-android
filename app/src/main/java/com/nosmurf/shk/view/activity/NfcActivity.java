@@ -1,6 +1,7 @@
 package com.nosmurf.shk.view.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
@@ -97,6 +98,11 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     protected void onResume() {
         super.onResume();
         nfcPresenter.onResume();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        nfcPresenter.onNewTagDetected(intent);
     }
 
     @Override
