@@ -1,5 +1,7 @@
 package com.nosmurf.shk.presenter;
 
+import android.content.Context;
+
 import com.nosmurf.shk.exception.ExceptionManager;
 import com.nosmurf.shk.navigation.Navigator;
 
@@ -37,6 +39,8 @@ public abstract class Presenter<T extends Presenter.View> {
         void showError(String message);
 
         void showError(int messageId);
+
+        Context getContext();
     }
 
 

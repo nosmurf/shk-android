@@ -46,6 +46,8 @@ dependencies {
     compile appDependencies.design
     compile appDependencies.support
 
+    compile appDependencies.playServices
+
     compile appDependencies.butterKnife
 
     compile appDependencies.rxJava
