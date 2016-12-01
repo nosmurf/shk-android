@@ -1,6 +1,5 @@
 package com.nosmurf.shk.view.activity;
 
-import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 
 import com.nosmurf.shk.R;
@@ -16,12 +15,17 @@ import butterknife.OnClick;
 
 public class MainActivity extends RootActivity implements MainPresenter.View {
 
+    public static final String TAG = "MainActivity";
+
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     MainComponent mainComponent;
 
     @Inject
     MainPresenter mainPresenter;
+
+    @Bind(R.id.camera)
+    FloatingActionButton camera;
 
     @Override
     public int getLayoutId() {
@@ -55,6 +59,11 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     protected void registerListeners() {
 
+    }
+
+    @OnClick(R.id.camera)
+    void takeAPhoto() {
+        mainPresenter.takeAPhoto();
     }
 
     @Override

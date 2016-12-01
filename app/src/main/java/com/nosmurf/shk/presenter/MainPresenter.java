@@ -1,5 +1,7 @@
 package com.nosmurf.shk.presenter;
 
+import android.util.Log;
+
 import javax.inject.Inject;
 
 public class MainPresenter extends Presenter<MainPresenter.View> {
@@ -18,7 +20,13 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     }
 
-    public interface View  extends Presenter.View{
+    public void takeAPhoto() {
+        
+    }
+
+
+    public interface View extends Presenter.View {
 
     }
+
 }
