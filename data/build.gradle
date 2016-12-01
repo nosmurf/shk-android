@@ -36,14 +36,14 @@ dependencies {
 
     compile project(':domain')
 
-    compile 'com.android.support:appcompat-v7:24.1.1'
-
     compile dataDependencies.rxJava
     compile dataDependencies.retrofit
     compile dataDependencies.gsonRetrofit
     compile dataDependencies.rxRetrofit
     compile dataDependencies.gson
+
     compile dataDependencies.firebaseStorage
+    compile dataDependencies.firebaseAuth
 
     androidTestCompile dataTestDependencies.testingSupportLib
     testCompile dataTestDependencies.junit

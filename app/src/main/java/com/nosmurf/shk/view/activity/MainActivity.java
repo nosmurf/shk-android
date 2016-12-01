@@ -1,7 +1,6 @@
 package com.nosmurf.shk.view.activity;
 
-import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
+import android.content.Context;
 
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerMainComponent;
@@ -10,9 +9,6 @@ import com.nosmurf.shk.presenter.MainPresenter;
 import com.nosmurf.shk.presenter.Presenter;
 
 import javax.inject.Inject;
-
-import butterknife.Bind;
-import butterknife.OnClick;
 
 public class MainActivity extends RootActivity implements MainPresenter.View {
 
@@ -80,5 +76,10 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     public void showError(int messageId) {
 
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }

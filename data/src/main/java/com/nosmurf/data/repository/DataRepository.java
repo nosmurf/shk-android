@@ -1,5 +1,6 @@
 package com.nosmurf.data.repository;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
 import com.nosmurf.domain.repository.Repository;
 
@@ -16,5 +17,10 @@ public class DataRepository implements Repository {
     @Inject
     public DataRepository(FirebaseDataSource firebaseDataSource) {
         this.firebaseDataSource = firebaseDataSource;
+    }
+
+    @Override
+    public Observable<Void> doLogin(GoogleSignInAccount account) {
+        return firebaseDataSource.doLogin(account);
     }
 }
