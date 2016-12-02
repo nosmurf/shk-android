@@ -16,9 +16,12 @@ public class DataRepository implements Repository {
 
     private FirebaseDataSource firebaseDataSource;
 
+    //private NetworkDataSource networkDataSource;
+
     @Inject
-    public DataRepository(FirebaseDataSource firebaseDataSource) {
+    public DataRepository(FirebaseDataSource firebaseDataSource/*, NetworkDataSource networkDataSource*/) {
         this.firebaseDataSource = firebaseDataSource;
+        //this.networkDataSource = networkDataSource;
     }
 
     @Override

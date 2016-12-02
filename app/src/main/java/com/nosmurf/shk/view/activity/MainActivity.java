@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.ContentLoadingProgressBar;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerMainComponent;
@@ -25,6 +29,12 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Inject
     MainPresenter mainPresenter;
+
+    @Bind(R.id.container)
+    RelativeLayout container;
+
+    @Bind(R.id.progress)
+    ContentLoadingProgressBar progress;
 
     @Bind(R.id.camera)
     FloatingActionButton camera;
@@ -69,27 +79,33 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Override
     public void showProgress(String message) {
-
+        progress.setVisibility(View.VISIBLE);
+        if (message != null) {
+            showSnackbar(message);
+        }
     }
 
     @Override
     public void showProgress(int messageId) {
-
+        progress.setVisibility(View.VISIBLE);
+        if (messageId != 0) {
+            showSnackbar(messageId);
+        }
     }
 
     @Override
     public void hideProgress() {
-
+        progress.setVisibility(View.GONE);
     }
 
     @Override
     public void showError(String message) {
-
+        showSnackbar(message);
     }
 
     @Override
     public void showError(int messageId) {
-
+        showSnackbar(messageId);
     }
 
     @Override
@@ -107,4 +123,13 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     public Context getContext() {
         return this;
     }
+
+    private void showSnackbar(int messageId) {
+        Snackbar.make(container, messageId, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showSnackbar(String message) {
+        Snackbar.make(container, message, Snackbar.LENGTH_SHORT).show();
+    }
+
 }

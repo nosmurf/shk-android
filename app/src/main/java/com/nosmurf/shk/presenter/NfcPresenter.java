@@ -76,7 +76,7 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     }
 
     public void onContinueClick() {
-        // TODO: 01/12/2016
+        navigator.navigateToMainActivity((RootActivity) view.getContext());
     }
 
     public void onResume() {

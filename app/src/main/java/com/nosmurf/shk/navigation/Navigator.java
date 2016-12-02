@@ -1,6 +1,5 @@
 package com.nosmurf.shk.navigation;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -40,10 +39,10 @@ public class Navigator {
     }
 
 
-    public void navigateToNfcActivity(Context context) {
-        Intent intent = NfcActivity.getCallingIntent(context);
-        context.startActivity(intent);
-        ((RootActivity) context).finish();
+    public void navigateToNfcActivity(RootActivity activity) {
+        Intent intent = NfcActivity.getCallingIntent(activity);
+        activity.startActivity(intent);
+        activity.finish();
     }
 
     public void navigateToMainActivity(RootActivity activity) {
