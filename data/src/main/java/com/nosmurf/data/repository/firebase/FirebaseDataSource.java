@@ -10,4 +10,8 @@ public interface FirebaseDataSource {
 
     Observable<Void> doLogin(GoogleSignInAccount account);
 
+    Observable<String> getCurrentUser();
+
+    Observable<Boolean> hasCurrentUser();
+
 }

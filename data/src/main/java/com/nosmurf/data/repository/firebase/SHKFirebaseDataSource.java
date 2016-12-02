@@ -85,4 +85,20 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             }
         });
     }
+
+    @Override
+    public Observable<Boolean> hasCurrentUser() {
+        return Observable.just(firebaseAuth.getCurrentUser() != null);
+    }
+
+    @Override
+    public Observable<String> getCurrentUser() {
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            return Observable.just(currentUser.getUid());
+        } else {
+            return Observable.error(new UserNotFoundException());
+        }
+    }
+
 }
