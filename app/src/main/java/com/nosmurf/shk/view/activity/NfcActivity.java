@@ -111,6 +111,12 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        nfcPresenter.onStop();
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         nfcPresenter.onNewTagDetected(intent);
     }

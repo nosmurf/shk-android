@@ -115,6 +115,10 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
         }
     }
 
+    public void onStop() {
+        adapter.disableForegroundDispatch(((NfcActivity) view.getContext()));
+    }
+
     public interface View extends Presenter.View {
         void showCompletedUI();
     }
