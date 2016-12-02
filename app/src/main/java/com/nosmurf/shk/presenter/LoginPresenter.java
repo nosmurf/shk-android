@@ -104,13 +104,13 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
             @Override
             public void onFingerPrintFinalError(FingerPrintDialog dialog) {
                 dialog.dismiss();
-                navigator.navigateToMainActivity((RootActivity) view.getContext());
+                navigator.navigateToNfcActivity((RootActivity) view.getContext());
             }
 
             @Override
             public void onFingerPrintNotSupported(FingerPrintDialog dialog) {
                 dialog.dismiss();
-                navigator.navigateToMainActivity((RootActivity) view.getContext());
+                navigator.navigateToNfcActivity((RootActivity) view.getContext());
             }
         });
     }

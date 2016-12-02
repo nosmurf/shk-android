@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.nosmurf.shk.R;
+import com.nosmurf.shk.utils.AnimationUtils;
 import com.pro100svitlo.fingerprintAuthHelper.FahErrorType;
 import com.pro100svitlo.fingerprintAuthHelper.FahListener;
 import com.pro100svitlo.fingerprintAuthHelper.FingerprintAuthHelper;
@@ -44,13 +45,12 @@ public class FingerPrintDialog extends DialogFragment {
         ButterKnife.bind(this, view);
 
         fingerprintAuthHelper = new FingerprintAuthHelper
-                .Builder(view.getContext(),
+                .Builder(getActivity(),
                 new FahListener() {
                     @Override
                     public void onFingerprintStatus(boolean authSuccessful, int errorType, @NotNull CharSequence charSequence) {
                         if (authSuccessful) {
                             showFingerPrintSuccess();
-                            onFingerPrintDialogListener.onFingerPrintSuccess(FingerPrintDialog.this);
                         } else if (fingerprintAuthHelper != null) {
                             // do some stuff here in case auth failed
                             switch (errorType) {
@@ -60,7 +60,6 @@ public class FingerPrintDialog extends DialogFragment {
                                     break;
                                 case FahErrorType.Auth.AUTH_NOT_RECOGNIZED:
                                     showFingerPrintError();
-                                    onFingerPrintDialogListener.onFingerPrintError(FingerPrintDialog.this);
                                     break;
                                 case FahErrorType.Auth.AUTH_TO_MANY_TRIES:
                                     showFingerPrintError();
@@ -88,13 +87,13 @@ public class FingerPrintDialog extends DialogFragment {
     private void showFingerPrintSuccess() {
         red.setVisibility(View.GONE);
         grey.setVisibility(View.GONE);
-        green.setVisibility(View.VISIBLE);
+        AnimationUtils.enterReveal(green, () -> onFingerPrintDialogListener.onFingerPrintSuccess(this), 2);
     }
 
     private void showFingerPrintError() {
-        red.setVisibility(View.VISIBLE);
         grey.setVisibility(View.GONE);
         green.setVisibility(View.GONE);
+        AnimationUtils.enterReveal(red, () -> onFingerPrintDialogListener.onFingerPrintError(this), 2);
     }
 
     @Override
