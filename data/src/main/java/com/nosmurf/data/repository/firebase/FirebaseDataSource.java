@@ -7,6 +7,9 @@ import com.nosmurf.domain.model.TokenHashed;
 import rx.Observable;
 
 public interface FirebaseDataSource {
+
+    Observable<Void> uploadPhoto(String imagePath);
+
     Observable<Void> doLogin(GoogleSignInAccount account);
 
     Observable<TokenHashed> getHashedToken();

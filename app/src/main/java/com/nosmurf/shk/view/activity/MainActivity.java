@@ -1,6 +1,9 @@
 package com.nosmurf.shk.view.activity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.support.design.widget.FloatingActionButton;
 
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerMainComponent;
@@ -10,7 +13,11 @@ import com.nosmurf.shk.presenter.Presenter;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
+
 public class MainActivity extends RootActivity implements MainPresenter.View {
+
+    public static final String TAG = "MainActivity";
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -19,9 +26,16 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Inject
     MainPresenter mainPresenter;
 
+    @Bind(R.id.camera)
+    FloatingActionButton camera;
+
+    public static Intent getCallingIntent(RootActivity rootActivity) {
+        return new Intent(rootActivity, MainActivity.class);
+    }
+
     @Override
     public int getLayoutId() {
-        return R.layout.main_activity_layout;
+        return R.layout.main_activity;
     }
 
     @Override
@@ -50,7 +64,7 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Override
     protected void registerListeners() {
-
+        camera.setOnClickListener(view -> mainPresenter.takeAPhoto(REQUEST_IMAGE_CAPTURE));
     }
 
     @Override
@@ -79,6 +93,17 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mainPresenter.showAndUploadPhoto();
+        }
+    }
+
+    @Override
+    public void showImage(Bitmap bitmap) {
+        // TODO: 01/12/2016 Show Photo
+    }
+
     public Context getContext() {
         return this;
     }

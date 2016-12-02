@@ -75,14 +75,15 @@ ext {
     ]
 
     dataDependencies = [
-            rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
-            gson           : "com.google.code.gson:gson:${gsonVersion}",
-            retrofit       : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
-            gsonRetrofit   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
-            rxRetrofit     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
-            retroLambda    : "${retroLambda}",
-            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}",
-            firebaseAuth   : "com.google.firebase:firebase-auth:${firebaseVersion}"
+            rxJava          : "io.reactivex:rxjava:${rxJavaVersion}",
+            gson            : "com.google.code.gson:gson:${gsonVersion}",
+            retrofit        : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+            gsonRetrofit    : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
+            rxRetrofit      : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+            retroLambda     : "${retroLambda}",
+            firebaseStorage : "com.google.firebase:firebase-storage:${firebaseVersion}",
+            firebaseAuth    : "com.google.firebase:firebase-auth:${firebaseVersion}",
+            firebaseDatabase: "com.google.firebase:firebase-database:${firebaseVersion}"
     ]
 
     dataTestDependencies = [

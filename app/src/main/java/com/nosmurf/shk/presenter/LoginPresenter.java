@@ -42,7 +42,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
         FragmentActivity context = (FragmentActivity) view.getContext();
         googleApiClient = new GoogleApiClient.Builder(context)
                 .enableAutoManage(context, connectionResult -> {
-                    // TODO: 01/12/2016 change hardcoded string
                     view.hideProgress();
                     view.showError(R.string.google_signin_error);
                     view.toggleSignInButton(true);

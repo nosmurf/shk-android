@@ -21,6 +21,11 @@ public class DataRepository implements Repository {
     }
 
     @Override
+    public Observable<Void> uploadPhoto(String imagePath) {
+        return firebaseDataSource.uploadPhoto(imagePath);
+    }
+
+    @Override
     public Observable<Void> doLogin(GoogleSignInAccount account) {
         return firebaseDataSource.doLogin(account);
     }

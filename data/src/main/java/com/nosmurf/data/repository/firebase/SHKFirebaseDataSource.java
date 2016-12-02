@@ -1,12 +1,23 @@
 package com.nosmurf.data.repository.firebase;
 
+import android.net.Uri;
+import android.util.Log;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -17,17 +28,64 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
 
+    private static final String USERS_PATH = "users/";
+
+    private static final String IMAGES = "IMAGES";
+
+    private static final String ALGORITHM = "SHA-384";
+
+    private static final String KEY = "key";
+
+    private final StorageReference storageReference;
+
     private final FirebaseAuth firebaseAuth;
+
+    private final DatabaseReference databaseReference;
+
 
     @Inject
     public SHKFirebaseDataSource() {
+        storageReference = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
     }
+
+    @Override
+    public Observable<Void> uploadPhoto(String imagePath) {
+        File image = new File(imagePath);
+        Uri uri = Uri.fromFile(image);
+
+        final StorageReference userPhotosRef = storageReference.child(firebaseAuth.getCurrentUser().getUid()).child(uri.getLastPathSegment());
+
+        return Observable.create((Subscriber<? super Uri> subscriber) -> {
+            userPhotosRef.putFile(uri)
+                    .addOnSuccessListener(task -> {
+                        subscriber.onNext(task.getDownloadUrl());
+                        subscriber.onCompleted();
+                    })
+                    .addOnFailureListener(subscriber::onError);
+        }).flatMap(new Func1<Uri, Observable<Void>>() {
+            @Override
+            public Observable<Void> call(Uri uri) {
+                return Observable.create((Subscriber<? super Void> subscriber) -> {
+                    DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+                    usersReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            subscriber.onCompleted();
+                        }
+                    }).addOnFailureListener(subscriber::onError);
+
+                });
+            }
+        });
+    }
+
 
     @Override
     public Observable<Void> doLogin(GoogleSignInAccount account) {
@@ -52,7 +110,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         return Observable.create((Subscriber<? super TokenHashed> subscriber) -> {
             String token = firebaseAuth.getCurrentUser().getUid();
             try {
-                MessageDigest messageDigest = MessageDigest.getInstance("SHA-384");
+                MessageDigest messageDigest = MessageDigest.getInstance(ALGORITHM);
                 for (byte b : token.getBytes()) {
                     messageDigest.update(b);
 
@@ -77,6 +135,18 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         return Observable.create(new Observable.OnSubscribe<Key>() {
             @Override
             public void call(Subscriber<? super Key> subscriber) {
+                DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+                usersReference.child(KEY).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.i(TAG, "onDataChange: " + dataSnapshot.getValue().toString());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "onCancelled: ");
+                    }
+                });
 
             }
         });
