@@ -9,6 +9,7 @@ import com.nosmurf.domain.model.TokenHashed;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -46,7 +47,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     @Override
     public Observable<TokenHashed> getHashedToken() {
-        return Observable.create(subscriber -> {
+        return Observable.create((Subscriber<? super TokenHashed> subscriber) -> {
             String token = firebaseAuth.getCurrentUser().getUid();
             try {
                 MessageDigest messageDigest = MessageDigest.getInstance("SHA-384");
@@ -66,6 +67,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 subscriber.onError(exception);
             }
 
-        });
+        }).delay(100, TimeUnit.MILLISECONDS);
     }
 }

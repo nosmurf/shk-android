@@ -28,5 +28,6 @@ public class Navigator {
     public void navigateToNfcActivity(Context context) {
         Intent intent = NfcActivity.getCallingIntent(context);
         context.startActivity(intent);
+        ((RootActivity) context).finish();
     }
 }
