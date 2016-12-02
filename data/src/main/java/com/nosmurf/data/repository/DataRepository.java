@@ -1,7 +1,5 @@
 package com.nosmurf.data.repository;
 
-import android.net.Uri;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
 import com.nosmurf.domain.repository.Repository;
@@ -22,7 +20,7 @@ public class DataRepository implements Repository {
     }
 
     @Override
-    public Observable<Uri> uploadPhoto(String imagePath) {
+    public Observable<Void> uploadPhoto(String imagePath) {
         return firebaseDataSource.uploadPhoto(imagePath);
     }
 

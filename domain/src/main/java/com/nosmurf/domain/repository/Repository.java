@@ -8,7 +8,7 @@ import rx.Observable;
 
 public interface Repository {
 
-    Observable<Uri> uploadPhoto(String imagePath);
+    Observable<Void> uploadPhoto(String imagePath);
 
     Observable<Void> doLogin(GoogleSignInAccount account);
 

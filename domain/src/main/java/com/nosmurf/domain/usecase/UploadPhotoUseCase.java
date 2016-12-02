@@ -24,7 +24,7 @@ public class UploadPhotoUseCase extends UseCase {
         this.repository = repository;
     }
 
-    public void execute(String imagePath, Subscriber subscriber) {
+    public void execute(String imagePath, Subscriber<Void> subscriber) {
         this.imagePath = imagePath;
 
         super.execute(subscriber);

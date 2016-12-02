@@ -2,8 +2,6 @@ package com.nosmurf.shk.presenter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.util.Log;
 
 import com.nosmurf.domain.usecase.UploadPhotoUseCase;
 import com.nosmurf.domain.usecase.UseCase;
@@ -16,8 +14,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import rx.Subscriber;
 
 public class MainPresenter extends Presenter<MainPresenter.View> {
 
@@ -60,13 +56,10 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         void showImage(Bitmap bitmap);
     }
 
-    private class UploadPhotoSubscriber extends Subscriber<Uri> {
-
-        Uri photoDownloadUrl;
+    private class UploadPhotoSubscriber extends PresenterSubscriber<Void> {
 
         @Override
         public void onCompleted() {
-            // TODO: 02/12/2016 Save Uri on database
             view.hideProgress();
         }
 
@@ -76,8 +69,8 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         }
 
         @Override
-        public void onNext(Uri uri) {
-            photoDownloadUrl = uri;
+        public void onNext(Void aVoid) {
+            
         }
 
     }
