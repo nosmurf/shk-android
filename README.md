@@ -9,6 +9,7 @@ In this repo We are working in Android application, this App should do:
 
 # How to build an execute
 Execute and build this app is too easy, simply:
+
 1. Download Android Studio (https://developer.android.com/studio/index.html)
 2. Download this project, unzip it and put in your favourite folder
 3. Open and configure AS
