@@ -7,8 +7,10 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 
+import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 import com.nosmurf.domain.usecase.GetHashedAuthTokenUseCase;
+import com.nosmurf.domain.usecase.GetKeyUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.view.activity.NfcActivity;
@@ -27,6 +29,8 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
 
     private final GetHashedAuthTokenUseCase getHashedAuthTokenUseCase;
 
+    private final GetKeyUseCase getKeyUseCase;
+
     private NfcAdapter adapter;
 
     private PendingIntent pendingIntent;
@@ -40,8 +44,10 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     private MifareClassic mifareClassic;
 
     @Inject
-    public NfcPresenter(@Named("getHashedTokenUseCase") UseCase getHashedAuthTokenUseCase) {
+    public NfcPresenter(@Named("getHashedTokenUseCase") UseCase getHashedAuthTokenUseCase,
+                        @Named("getKeyUseCase") UseCase getKeyUseCase) {
         this.getHashedAuthTokenUseCase = (GetHashedAuthTokenUseCase) getHashedAuthTokenUseCase;
+        this.getKeyUseCase = (GetKeyUseCase) getKeyUseCase;
         this.sectorIndex = 3; // FIXME: 01/12/2016 please, remove hardcoded value
     }
 
@@ -79,6 +85,25 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
 
         try {
             mifareClassic.connect();
+
+            getKeyUseCase.execute(new PresenterSubscriber<Key>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onNext(Key key) {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    super.onError(e);
+                }
+            });
+
+
             // 19 72 5d 85 51 31 // FIXME: 01/12/2016 please, remove hardcoded key
             byte keyA[] = {(byte) 0x19, (byte) 0x72, (byte) 0x5d, (byte) 0x85, (byte) 0x51, (byte) 0x31};
 

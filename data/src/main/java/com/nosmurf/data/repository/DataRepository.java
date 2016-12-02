@@ -2,6 +2,7 @@ package com.nosmurf.data.repository;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
+import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 import com.nosmurf.domain.repository.Repository;
 
@@ -33,5 +34,10 @@ public class DataRepository implements Repository {
     @Override
     public Observable<TokenHashed> getHashedToken() {
         return firebaseDataSource.getHashedToken();
+    }
+
+    @Override
+    public Observable<Key> getKey() {
+        return firebaseDataSource.getKey();
     }
 }

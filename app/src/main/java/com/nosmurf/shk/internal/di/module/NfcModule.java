@@ -1,6 +1,7 @@
 package com.nosmurf.shk.internal.di.module;
 
 import com.nosmurf.domain.usecase.GetHashedAuthTokenUseCase;
+import com.nosmurf.domain.usecase.GetKeyUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.internal.di.PerActivity;
 
@@ -14,6 +15,14 @@ import dagger.Provides;
  */
 @Module
 public class NfcModule {
+
+    @Provides
+    @PerActivity
+    @Named("getKeyUseCase")
+    UseCase provideGetKeyUseCase(GetKeyUseCase getKeyUseCase) {
+        return getKeyUseCase;
+    }
+
     @Provides
     @PerActivity
     @Named("getHashedTokenUseCase")
