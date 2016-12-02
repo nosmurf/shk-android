@@ -88,6 +88,10 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
         }
     }
 
+    public void goToMainActivity() {
+        navigator.navigateToMainActivity((RootActivity) view);
+    }
+
     public interface View extends Presenter.View {
         void showCompletedUI();
 

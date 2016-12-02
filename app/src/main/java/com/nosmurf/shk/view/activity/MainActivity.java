@@ -29,6 +29,10 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Bind(R.id.camera)
     FloatingActionButton camera;
 
+    public static Intent getCallingIntent(RootActivity rootActivity) {
+        return new Intent(rootActivity, MainActivity.class);
+    }
+
     @Override
     public int getLayoutId() {
         return R.layout.main_activity;

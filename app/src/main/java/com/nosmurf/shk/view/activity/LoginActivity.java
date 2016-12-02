@@ -83,6 +83,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Override
     protected void registerListeners() {
         signInButton.setOnClickListener(v -> loginPresenter.onSignInClick());
+        continueButton.setOnClickListener(v -> loginPresenter.goToMainActivity());
     }
 
     @Override

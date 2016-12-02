@@ -6,6 +6,7 @@ import android.provider.MediaStore;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.nosmurf.shk.view.activity.MainActivity;
 import com.nosmurf.shk.view.activity.RootActivity;
 
 import java.io.File;
@@ -36,4 +37,9 @@ public class Navigator {
         activity.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    public void navigateToMainActivity(RootActivity activity) {
+        Intent intent = MainActivity.getCallingIntent(activity);
+        activity.startActivity(intent);
+        activity.finish();
+    }
 }
