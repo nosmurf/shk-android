@@ -4,11 +4,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -68,5 +70,26 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             }
 
         }).delay(100, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public Observable<Key> getKey() {
+        return Observable.create(new Observable.OnSubscribe<Key>() {
+            @Override
+            public void call(Subscriber<? super Key> subscriber) {
+
+            }
+        });
+    }
+
+    private String getRandomHexString() {
+        Random random = new Random();
+        StringBuffer sb = new StringBuffer();
+        int nBytes = 6;
+        while (sb.length() < nBytes) {
+            sb.append(Integer.toHexString(random.nextInt()));
+        }
+
+        return sb.toString().substring(0, nBytes);
     }
 }
