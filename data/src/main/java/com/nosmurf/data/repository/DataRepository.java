@@ -38,13 +38,13 @@ public class DataRepository implements Repository {
     public Observable<Void> doLogin(GoogleSignInAccount account) {
 
         return firebaseDataSource.doLogin(account)
-                .flatMap(new Func1<Void, Observable<Boolean>>() {
+                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(Void aVoid) {
+                    public Observable<Boolean> call(Boolean logged) {
                         return firebaseDataSource.hasMicrosoftId();
                     }
                 }).filter((aBoolean1) -> !aBoolean1)
-                 .flatMap(new Func1<Boolean, Observable<Void>>() {
+                .flatMap(new Func1<Boolean, Observable<Void>>() {
                     @Override
                     public Observable<Void> call(Boolean aBoolean) {
                         return Observable.zip(firebaseDataSource.getCurrentUser(), firebaseDataSource.getGroupId(),

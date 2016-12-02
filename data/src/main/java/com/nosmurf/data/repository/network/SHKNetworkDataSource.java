@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 @Singleton
 public class SHKNetworkDataSource implements NetworkDataSource {
@@ -24,6 +26,8 @@ public class SHKNetworkDataSource implements NetworkDataSource {
     @Override
     public Observable<String> createPersonOnMicrosoftFaceAPI(PersonReference personReference) {
         return apiService.createPerson(personReference.getGroupId(), new UserDto(personReference.getCurrentUser()))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .map(UserRegisteredDtoResponse::getPersonId);
     }
 

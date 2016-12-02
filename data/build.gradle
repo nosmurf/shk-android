@@ -40,6 +40,7 @@ dependencies {
     compile dataDependencies.retrofit
     compile dataDependencies.gsonRetrofit
     compile dataDependencies.rxRetrofit
+    compile appDependencies.rxAndroid
     compile dataDependencies.gson
 
     compile dataDependencies.okHttp

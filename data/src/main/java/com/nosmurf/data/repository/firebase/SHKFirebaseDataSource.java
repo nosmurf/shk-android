@@ -1,8 +1,11 @@
 package com.nosmurf.data.repository.firebase;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -76,14 +79,15 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
 
     @Override
-    public Observable<Void> doLogin(GoogleSignInAccount account) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+    public Observable<Boolean> doLogin(GoogleSignInAccount account) {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(Subscriber<? super Boolean> subscriber) {
                 AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
                 firebaseAuth.signInWithCredential(credential)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
+                                subscriber.onNext(true);
                                 subscriber.onCompleted();
                             } else {
                                 subscriber.onError(task.getException());
@@ -159,7 +163,8 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     public Observable<Void> saveMicrosoftId(String microsoftId) {
         return Observable.create(subscriber -> {
             databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
-                    .setValue(microsoftId);
+                    .setValue(microsoftId)
+                    .addOnCompleteListener(task -> subscriber.onCompleted());
         });
     }
 
