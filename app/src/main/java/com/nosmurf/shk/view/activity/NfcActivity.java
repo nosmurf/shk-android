@@ -134,6 +134,7 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     public void showCompletedUI() {
         AnimationUtils.enterReveal(reveal, () -> {
             done.setVisibility(View.VISIBLE);
+            continueButton.setVisibility(View.VISIBLE);
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat
                     .getColor(NfcActivity.this, R.color.light_green_700)));
         }, 1);
