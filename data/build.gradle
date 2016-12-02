@@ -42,6 +42,9 @@ dependencies {
     compile dataDependencies.rxRetrofit
     compile dataDependencies.gson
 
+    compile dataDependencies.okHttp
+    compile dataDependencies.okHttpLog
+
     compile dataDependencies.firebaseStorage
     compile dataDependencies.firebaseAuth
     compile dataDependencies.firebaseDatabase

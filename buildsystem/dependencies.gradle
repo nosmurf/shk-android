@@ -26,6 +26,7 @@ ext {
     gsonVersion = '2.7'
     rxFingerPrintVersion = '2.0.0'
     firebaseVersion = '9.6.1'
+    okHttpVersion = '3.5.0'
 
     //RetroLambda
     retroLambda = 'me.tatarka.retrolambda'
@@ -83,7 +84,9 @@ ext {
             retroLambda     : "${retroLambda}",
             firebaseStorage : "com.google.firebase:firebase-storage:${firebaseVersion}",
             firebaseAuth    : "com.google.firebase:firebase-auth:${firebaseVersion}",
-            firebaseDatabase: "com.google.firebase:firebase-database:${firebaseVersion}"
+            firebaseDatabase: "com.google.firebase:firebase-database:${firebaseVersion}",
+            okHttpLog       : "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
+            okHttp          : "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     ]
 
     dataTestDependencies = [
