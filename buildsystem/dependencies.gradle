@@ -50,7 +50,9 @@ ext {
             rxAndroid      : "io.reactivex:rxandroid:${rxAndroidVersion}",
             javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
             rxFingerPrint  : "com.mtramin:rxfingerprint:${rxFingerPrintVersion}",
-            retroLambda    : "${retroLambda}"
+            retroLambda    : "${retroLambda}",
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
+
     ]
 
     appTestDependencies = [
@@ -63,7 +65,8 @@ ext {
             rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
             javaxInject    : "javax.inject:javax.inject:${javaxInjectVersion}",
             javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
-            retroLambda    : "${retroLambda}"
+            retroLambda    : "${retroLambda}",
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
     ]
 
     domainTestDependencies = [
@@ -78,7 +81,8 @@ ext {
             gsonRetrofit   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
             rxRetrofit     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
             retroLambda    : "${retroLambda}",
-            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}"
+            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}",
+            firebaseAuth   : "com.google.firebase:firebase-auth:${firebaseVersion}"
     ]
 
     dataTestDependencies = [

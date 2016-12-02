@@ -5,5 +5,9 @@
 
     <!-- Exception Messages -->
     <string name="exception_message_generic">There was an application error</string>
+    <string name="server_client_id">36492923646-tjm945in7nrq9smi14aje0juqg0frfkf.apps.googleusercontent.com</string>
+    <string name="continue_text">Continue</string>
+    <string name="google_signin_error">Error when sign in into Google</string>
+    <string name="loging">Trying to do login...</string>
 
 </resources>

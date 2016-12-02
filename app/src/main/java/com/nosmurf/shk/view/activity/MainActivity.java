@@ -1,5 +1,6 @@
 package com.nosmurf.shk.view.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
@@ -13,7 +14,6 @@ import com.nosmurf.shk.presenter.Presenter;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import butterknife.OnClick;
 
 public class MainActivity extends RootActivity implements MainPresenter.View {
 
@@ -60,12 +60,7 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Override
     protected void registerListeners() {
-
-    }
-
-    @OnClick(R.id.camera)
-    void takeAPhoto() {
-        mainPresenter.takeAPhoto(REQUEST_IMAGE_CAPTURE);
+        camera.setOnClickListener(view -> mainPresenter.takeAPhoto(REQUEST_IMAGE_CAPTURE));
     }
 
     @Override
@@ -102,6 +97,10 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Override
     public void showImage(Bitmap bitmap) {
-        // TODO: 01/12/2016 Show Photo 
+        // TODO: 01/12/2016 Show Photo
+    }
+
+    public Context getContext() {
+        return this;
     }
 }

@@ -1,31 +1,44 @@
+def globalConfiguration = rootProject.extensions.getByName("ext")
 def domainDependencies = rootProject.ext.domainDependencies
 def domainTestDependencies = rootProject.ext.domainTestDependencies
 
-apply plugin: 'java'
+
+apply plugin: 'com.android.library'
 apply plugin: domainDependencies.retroLambda
 
-//noinspection GroovyUnusedAssignment
-sourceCompatibility = 1.8
-//noinspection GroovyUnusedAssignment
-targetCompatibility = 1.8
+android {
 
-configurations {
-    provided
-}
+    compileSdkVersion globalConfiguration.getAt("androidCompileSdkVersion");
+    buildToolsVersion globalConfiguration.getAt("androidBuildToolsVersion");
 
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
+    defaultConfig {
+        minSdkVersion globalConfiguration.getAt("androidMinSdkVersion")
+        targetSdkVersion globalConfiguration.getAt("androidTargetSdkVersion")
+        versionCode globalConfiguration.getAt("androidVersionCode")
+        versionName globalConfiguration.getAt("androidVersionName")
+        testInstrumentationRunner globalConfiguration.getAt("testInstrumentationRunner")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-
-
     provided domainDependencies.javaxAnnotation
 
     compile domainDependencies.javaxInject
     compile domainDependencies.rxJava
+
+    compile domainDependencies.playServices
 
     testCompile domainTestDependencies.junit
     testCompile domainTestDependencies.mockito
