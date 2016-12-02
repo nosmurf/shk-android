@@ -1,6 +1,7 @@
 package com.nosmurf.data.repository;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.nosmurf.data.model.ImageReference;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
 import com.nosmurf.data.repository.network.NetworkDataSource;
 import com.nosmurf.domain.repository.Repository;
@@ -25,11 +26,16 @@ public class DataRepository implements Repository {
 
     @Override
     public Observable<Void> uploadPhoto(String imagePath) {
-        return firebaseDataSource.uploadPhoto(imagePath);
+        return Observable
+                .zip(firebaseDataSource.uploadPhoto(imagePath), firebaseDataSource.getGroupId(), firebaseDataSource.getPersonId(),
+                        (imageUrl, groupId, personId) -> new ImageReference(groupId, personId, imageUrl))
+                .flatMap(imageReference -> networkDataSource.addFaceOnMicrosoftFaceAPI(imageReference));
     }
 
     @Override
     public Observable<Void> doLogin(GoogleSignInAccount account) {
         return firebaseDataSource.doLogin(account);
     }
+
+
 }

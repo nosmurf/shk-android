@@ -5,11 +5,16 @@ import android.net.Uri;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nosmurf.data.exception.UserNotFoundException;
 
 import java.io.File;
 
@@ -22,6 +27,7 @@ import rx.functions.Func1;
 public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
+    private static final String GROUP_ID = "";
 
     private final StorageReference storageReference;
 
@@ -38,7 +44,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Void> uploadPhoto(String imagePath) {
+    public Observable<String> uploadPhoto(String imagePath) {
         File image = new File(imagePath);
         Uri uri = Uri.fromFile(image);
 
@@ -51,13 +57,14 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                         subscriber.onCompleted();
                     })
                     .addOnFailureListener(subscriber::onError);
-        }).flatMap(new Func1<Uri, Observable<Void>>() {
+        }).flatMap(new Func1<Uri, Observable<String>>() {
             @Override
-            public Observable<Void> call(Uri uri) {
-                return Observable.create((Subscriber<? super Void> subscriber) -> {
+            public Observable<String> call(Uri uri) {
+                return Observable.create((Subscriber<? super String> subscriber) -> {
                     DatabaseReference usersReference = databaseReference.child("users/" + firebaseAuth.getCurrentUser().getUid());
                     usersReference.child("images").push().setValue(uri.toString()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            subscriber.onNext(uri.toString());
                             subscriber.onCompleted();
                         }
                     }).addOnFailureListener(subscriber::onError);
@@ -89,6 +96,44 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     @Override
     public Observable<Boolean> hasCurrentUser() {
         return Observable.just(firebaseAuth.getCurrentUser() != null);
+    }
+
+    @Override
+    public Observable<String> getGroupId() {
+        return Observable.create(subscriber -> {
+            databaseReference.child("groupId").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String groupId = dataSnapshot.getValue(String.class);
+                    subscriber.onNext(groupId);
+                    subscriber.onCompleted();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    subscriber.onError(databaseError.toException());
+                }
+            });
+        });
+    }
+
+    @Override
+    public Observable<String> getPersonId() {
+        return Observable.create(subscriber -> {
+            databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            subscriber.onNext(dataSnapshot.getValue(String.class));
+                            subscriber.onCompleted();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            subscriber.onError(databaseError.toException());
+                        }
+                    });
+        });
     }
 
     @Override

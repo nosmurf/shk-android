@@ -6,12 +6,16 @@ import rx.Observable;
 
 public interface FirebaseDataSource {
 
-    Observable<Void> uploadPhoto(String imagePath);
+    Observable<String> uploadPhoto(String imagePath);
 
     Observable<Void> doLogin(GoogleSignInAccount account);
 
     Observable<String> getCurrentUser();
 
     Observable<Boolean> hasCurrentUser();
+
+    Observable<String> getGroupId();
+
+    Observable<String> getPersonId();
 
 }

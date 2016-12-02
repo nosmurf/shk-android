@@ -1,7 +1,5 @@
 package com.nosmurf.domain.repository;
 
-import android.net.Uri;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import rx.Observable;
