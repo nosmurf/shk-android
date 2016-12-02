@@ -87,7 +87,7 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
                     @Override
                     public void onCompleted() {
                         view.hideProgress();
-                        view.showError("jaja funsiona");
+                        view.showCompletedUI();
                     }
 
                     @Override
@@ -116,6 +116,6 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     }
 
     public interface View extends Presenter.View {
-
+        void showCompletedUI();
     }
 }

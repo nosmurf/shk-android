@@ -15,6 +15,7 @@ import com.nosmurf.shk.internal.di.component.NfcComponent;
 import com.nosmurf.shk.internal.di.module.NfcModule;
 import com.nosmurf.shk.presenter.NfcPresenter;
 import com.nosmurf.shk.presenter.Presenter;
+import com.nosmurf.shk.utils.AnimationUtils;
 
 import javax.inject.Inject;
 
@@ -37,6 +38,9 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Bind(R.id.continue_button)
     Button continueButton;
+
+    @Bind(R.id.reveal)
+    View reveal;
 
     @Inject
     NfcPresenter nfcPresenter;
@@ -122,5 +126,10 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     @Override
     protected void registerListeners() {
         continueButton.setOnClickListener(v -> nfcPresenter.onContinueClick());
+    }
+
+    @Override
+    public void showCompletedUI() {
+        AnimationUtils.enterReveal(reveal, () -> done.setVisibility(View.VISIBLE), 1);
     }
 }
