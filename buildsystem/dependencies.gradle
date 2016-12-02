@@ -26,6 +26,7 @@ ext {
     gsonVersion = '2.7'
     rxFingerPrintVersion = '2.0.0'
     firebaseVersion = '9.6.1'
+    fingerPrintVersion = '1.1.7'
 
     //RetroLambda
     retroLambda = 'me.tatarka.retrolambda'
@@ -43,15 +44,14 @@ ext {
             design         : "com.android.support:design:${appcompatVersion}",
             recycler       : "com.android.support:recyclerview-v7:${appcompatVersion}",
             rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
-            rxJava2        : "io.reactivex.rxjava2:rxjava:${rxJava2Version}",
             daggerCompiler : "com.google.dagger:dagger-compiler:${daggerVersion}",
             dagger         : "com.google.dagger:dagger:${daggerVersion}",
             butterKnife    : "com.jakewharton:butterknife:${butterKnifeVersion}",
             rxAndroid      : "io.reactivex:rxandroid:${rxAndroidVersion}",
             javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
-            rxFingerPrint  : "com.mtramin:rxfingerprint:${rxFingerPrintVersion}",
             retroLambda    : "${retroLambda}",
-            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}",
+            fingerprint    : "com.github.pro100svitlo:fingerprintAuthHelper:${fingerPrintVersion}"
 
     ]
 
