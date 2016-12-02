@@ -1,7 +1,6 @@
 package com.nosmurf.data.repository.firebase;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
@@ -113,7 +112,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 MessageDigest messageDigest = MessageDigest.getInstance(ALGORITHM);
                 for (byte b : token.getBytes()) {
                     messageDigest.update(b);
-
                 }
 
                 // FIXME: 01/12/2016 remove hardcoded numbers
@@ -139,12 +137,18 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 usersReference.child(KEY).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.i(TAG, "onDataChange: " + dataSnapshot.getValue().toString());
+                        Object value = dataSnapshot.getValue();
+                        if (value == null) {
+                            usersReference.child(KEY).setValue(getRandomHexString());
+                        } else {
+                            subscriber.onNext(new Key(3, ((String) value).getBytes()));
+                            subscriber.onCompleted();
+                        }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e(TAG, "onCancelled: ");
+                        subscriber.onError(new RuntimeException(databaseError.getMessage()));
                     }
                 });
 
@@ -155,7 +159,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     private String getRandomHexString() {
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
-        int nBytes = 6;
+        int nBytes = 12;
         while (sb.length() < nBytes) {
             sb.append(Integer.toHexString(random.nextInt()));
         }
