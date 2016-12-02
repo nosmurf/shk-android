@@ -18,6 +18,7 @@ import com.nosmurf.shk.internal.di.component.LoginComponent;
 import com.nosmurf.shk.internal.di.module.LoginModule;
 import com.nosmurf.shk.presenter.LoginPresenter;
 import com.nosmurf.shk.presenter.Presenter;
+import com.nosmurf.shk.utils.AnimationUtils;
 
 import javax.inject.Inject;
 
@@ -46,6 +47,9 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Bind(R.id.continue_button)
     Button continueButton;
+
+    @Bind(R.id.reveal)
+    View reveal;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -138,12 +142,15 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Override
     public void showCompletedUI() {
         hideProgress();
-        done.setVisibility(View.VISIBLE);
-        continueButton.setVisibility(View.VISIBLE);
-        int green = ContextCompat.getColor(this, R.color.light_green_500);
-        container.setBackgroundColor(green);
 
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(green));
+        AnimationUtils.enterReveal(reveal, () -> {
+            done.setVisibility(View.VISIBLE);
+            continueButton.setVisibility(View.VISIBLE);
+            int green = ContextCompat.getColor(this, R.color.light_green_500);
+            container.setBackgroundColor(green);
+
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(green));
+        }, 1);
     }
 
     @Override
