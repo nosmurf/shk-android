@@ -6,9 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/camera"
-        app:backgroundTint="@color/colorPrimary"
         android:layout_width="@dimen/fab"
         android:layout_height="@dimen/fab"
         android:layout_alignParentBottom="true"
@@ -16,6 +23,7 @@
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_photo_camera_white_24dp"
-        android:visibility="visible" />
+        android:visibility="visible"
+        app:backgroundTint="@color/colorPrimary" />
 
 </RelativeLayout>

@@ -49,6 +49,7 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
     public void showAndUploadPhoto() {
         Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
         view.showImage(bitmap);
+        view.showProgress(null);
         uploadPhotoUseCase.execute(photoPath, new UploadPhotoSubscriber());
     }
 
@@ -70,7 +71,7 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
         @Override
         public void onNext(Void aVoid) {
-            
+
         }
 
     }
