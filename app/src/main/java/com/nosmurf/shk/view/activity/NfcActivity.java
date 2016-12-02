@@ -2,7 +2,9 @@ package com.nosmurf.shk.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.Button;
@@ -130,6 +132,10 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Override
     public void showCompletedUI() {
-        AnimationUtils.enterReveal(reveal, () -> done.setVisibility(View.VISIBLE), 1);
+        AnimationUtils.enterReveal(reveal, () -> {
+            done.setVisibility(View.VISIBLE);
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat
+                    .getColor(NfcActivity.this, R.color.light_green_700)));
+        }, 1);
     }
 }
