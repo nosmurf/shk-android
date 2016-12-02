@@ -6,6 +6,8 @@ import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 import com.nosmurf.domain.repository.Repository;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -46,6 +48,7 @@ public class DataRepository implements Repository {
 
     @Override
     public Observable<Boolean> hasCurrentUser() {
-        return firebaseDataSource.hasCurrentUser();
+        return firebaseDataSource.hasCurrentUser()
+                .delay(500, TimeUnit.MILLISECONDS);
     }
 }

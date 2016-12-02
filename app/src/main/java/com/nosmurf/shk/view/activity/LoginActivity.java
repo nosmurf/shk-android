@@ -54,6 +54,10 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Inject
     LoginPresenter loginPresenter;
 
+    public static Intent getCallingIntent(RootActivity activity) {
+        return new Intent(activity, LoginActivity.class);
+    }
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_login;
