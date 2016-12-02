@@ -30,15 +30,11 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     private final GetHashedAuthTokenUseCase getHashedAuthTokenUseCase;
 
     private final GetKeyUseCase getKeyUseCase;
-
+    byte defaultKeyA[] = {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
     private NfcAdapter adapter;
-
     private PendingIntent pendingIntent;
-
     private IntentFilter[] filters;
-
     private String[][] techListsArray;
-
     private int sectorIndex;
 
     private MifareClassic mifareClassic;
@@ -51,6 +47,15 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
         this.sectorIndex = 3; // FIXME: 01/12/2016 please, remove hardcoded value
     }
 
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
+    }
 
     @Override
     protected void initialize() {
@@ -85,50 +90,64 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
 
         try {
             mifareClassic.connect();
+            encryptNfcTag();
 
-            getKeyUseCase.execute(new PresenterSubscriber<Key>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onNext(Key key) {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    super.onError(e);
-                }
-            });
-
-
-            // 19 72 5d 85 51 31 // FIXME: 01/12/2016 please, remove hardcoded key
-            byte keyA[] = {(byte) 0x19, (byte) 0x72, (byte) 0x5d, (byte) 0x85, (byte) 0x51, (byte) 0x31};
-
-            if (mifareClassic.authenticateSectorWithKeyA(sectorIndex, keyA)) {
-                getHashedAuthTokenUseCase.execute(new PresenterSubscriber<TokenHashed>() {
-                    @Override
-                    public void onCompleted() {
-                        view.hideProgress();
-                        view.showCompletedUI();
-                    }
-
-                    @Override
-                    public void onNext(TokenHashed tokenHashed) {
-                        writeTag(tokenHashed);
-                    }
-                });
-            } else {
-                view.hideProgress();
-                view.showError(R.string.error_auth);
-            }
         } catch (IOException e) {
             view.hideProgress();
             view.showError(R.string.error_reading_tag);
         }
 
+    }
+
+    private void writeToken() {
+        getHashedAuthTokenUseCase.execute(new PresenterSubscriber<TokenHashed>() {
+            @Override
+            public void onCompleted() {
+                view.hideProgress();
+                view.showCompletedUI();
+            }
+
+            @Override
+            public void onNext(TokenHashed tokenHashed) {
+                writeTag(tokenHashed);
+            }
+        });
+    }
+
+    private void encryptNfcTag() {
+        getKeyUseCase.execute(new PresenterSubscriber<Key>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onNext(Key key) {
+                try {
+                    if (mifareClassic.authenticateSectorWithKeyA(key.getSector(), hexStringToByteArray(key.getValue()))) {
+                        writeToken();
+                    } else if (mifareClassic.authenticateSectorWithKeyA(key.getSector(), defaultKeyA)) {
+                        byte[] bytes = mifareClassic.readBlock(key.getBlock());
+                        byte[] value = hexStringToByteArray(key.getValue());
+                        System.arraycopy(value, 0, bytes, 0, value.length);
+
+                        mifareClassic.writeBlock(key.getBlock(), bytes);
+                        writeToken();
+                    } else {
+                        view.hideProgress();
+                        view.showError(R.string.error_format_tag);
+                    }
+                } catch (IOException e) {
+                    view.hideProgress();
+                    view.showError(R.string.error_writing_tag_key);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                super.onError(e);
+            }
+        });
     }
 
     private void writeTag(TokenHashed tokenHashed) {

@@ -115,9 +115,9 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 }
 
                 // FIXME: 01/12/2016 remove hardcoded numbers
-                subscriber.onNext(new TokenHashed(12, Arrays.copyOfRange(messageDigest.digest(), 0, 16)));
-                subscriber.onNext(new TokenHashed(13, Arrays.copyOfRange(messageDigest.digest(), 16, 32)));
-                subscriber.onNext(new TokenHashed(14, Arrays.copyOfRange(messageDigest.digest(), 32, 48)));
+                subscriber.onNext(new TokenHashed(16, Arrays.copyOfRange(messageDigest.digest(), 0, 16)));
+                subscriber.onNext(new TokenHashed(17, Arrays.copyOfRange(messageDigest.digest(), 16, 32)));
+                subscriber.onNext(new TokenHashed(18, Arrays.copyOfRange(messageDigest.digest(), 32, 48)));
 
                 subscriber.onCompleted();
 
@@ -141,7 +141,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                         if (value == null) {
                             usersReference.child(KEY).setValue(getRandomHexString());
                         } else {
-                            subscriber.onNext(new Key(3, ((String) value).getBytes()));
+                            subscriber.onNext(new Key(4, 19, (String) value));
                             subscriber.onCompleted();
                         }
                     }

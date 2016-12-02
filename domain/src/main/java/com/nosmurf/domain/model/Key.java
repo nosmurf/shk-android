@@ -7,19 +7,30 @@ package com.nosmurf.domain.model;
 public class Key {
     private int sector;
 
-    private byte[] value;
+    private int block;
 
-    public Key(int sector, byte[] value) {
+    private String value;
+
+    public Key(int sector, int block, String value) {
         this.sector = sector;
+        this.block = block;
         this.value = value;
     }
 
-    public byte[] getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(byte[] value) {
+    public void setValue(String value) {
         this.value = value;
+    }
+
+    public int getBlock() {
+        return block;
+    }
+
+    public void setBlock(int block) {
+        this.block = block;
     }
 
     public int getSector() {
