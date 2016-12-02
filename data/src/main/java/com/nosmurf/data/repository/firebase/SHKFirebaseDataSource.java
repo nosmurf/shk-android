@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nosmurf.data.exception.UserNotFoundException;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
@@ -165,5 +167,19 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         }
 
         return sb.toString().substring(0, nBytes);
+    }
+
+    public Observable<Boolean> hasCurrentUser() {
+        return Observable.just(firebaseAuth.getCurrentUser() != null);
+    }
+
+    @Override
+    public Observable<String> getCurrentUser() {
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            return Observable.just(currentUser.getUid());
+        } else {
+            return Observable.error(new UserNotFoundException());
+        }
     }
 }

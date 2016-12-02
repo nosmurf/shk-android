@@ -15,4 +15,6 @@ public interface Repository {
     Observable<TokenHashed> getHashedToken();
 
     Observable<Key> getKey();
+
+    Observable<Boolean> hasCurrentUser();
 }

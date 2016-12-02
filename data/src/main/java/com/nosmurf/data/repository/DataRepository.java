@@ -43,4 +43,9 @@ public class DataRepository implements Repository {
     public Observable<Key> getKey() {
         return firebaseDataSource.getKey();
     }
+
+    @Override
+    public Observable<Boolean> hasCurrentUser() {
+        return firebaseDataSource.hasCurrentUser();
+    }
 }

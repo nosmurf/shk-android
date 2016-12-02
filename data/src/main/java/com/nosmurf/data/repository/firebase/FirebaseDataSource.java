@@ -15,4 +15,8 @@ public interface FirebaseDataSource {
     Observable<TokenHashed> getHashedToken();
 
     Observable<Key> getKey();
+
+    Observable<String> getCurrentUser();
+
+    Observable<Boolean> hasCurrentUser();
 }
