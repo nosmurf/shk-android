@@ -44,6 +44,7 @@ dependencies {
 
     compile dataDependencies.firebaseStorage
     compile dataDependencies.firebaseAuth
+    compile dataDependencies.firebaseDatabase
 
     androidTestCompile dataTestDependencies.testingSupportLib
     testCompile dataTestDependencies.junit
