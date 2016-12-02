@@ -111,9 +111,9 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        nfcPresenter.onStop();
+    protected void onPause() {
+        super.onPause();
+        nfcPresenter.onPause();
     }
 
     @Override

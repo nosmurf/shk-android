@@ -115,7 +115,7 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
         }
     }
 
-    public void onStop() {
+    public void onPause() {
         adapter.disableForegroundDispatch(((NfcActivity) view.getContext()));
     }
 
