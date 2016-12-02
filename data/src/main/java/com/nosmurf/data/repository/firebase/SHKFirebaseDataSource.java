@@ -137,6 +137,33 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
+    public Observable<Boolean> hasMicrosoftId() {
+        return Observable.create(subscriber -> {
+            databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            subscriber.onNext(dataSnapshot.getValue(String.class) != null);
+                            subscriber.onCompleted();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            subscriber.onError(databaseError.toException());
+                        }
+                    });
+        });
+    }
+
+    @Override
+    public Observable<Void> saveMicrosoftId(String microsoftId) {
+        return Observable.create(subscriber -> {
+            databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
+                    .setValue(microsoftId);
+        });
+    }
+
+    @Override
     public Observable<String> getCurrentUser() {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {

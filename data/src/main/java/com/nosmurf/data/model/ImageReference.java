@@ -12,7 +12,7 @@ public class ImageReference {
 
     String imageUrl;
 
-    public ImageReference(String groupId, String personId, String imageUrl) {
+    public ImageReference(String imageUrl, String groupId, String personId) {
         this.groupId = groupId;
         this.personId = personId;
         this.imageUrl = imageUrl;

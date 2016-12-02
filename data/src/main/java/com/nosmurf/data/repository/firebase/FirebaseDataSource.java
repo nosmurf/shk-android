@@ -18,4 +18,7 @@ public interface FirebaseDataSource {
 
     Observable<String> getPersonId();
 
+    Observable<Boolean> hasMicrosoftId();
+
+    Observable<Void> saveMicrosoftId(String microsoftId);
 }

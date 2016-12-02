@@ -1,13 +1,13 @@
 package com.nosmurf.data.repository.network;
 
 import com.nosmurf.data.model.ImageReference;
-import com.nosmurf.data.model.UserRegisteredDtoResponse;
+import com.nosmurf.data.model.PersonReference;
 
 import rx.Observable;
 
 public interface NetworkDataSource {
 
-    Observable<UserRegisteredDtoResponse> createPersonOnMicrosoftFaceAPI(String personGroupId, String name);
+    Observable<String> createPersonOnMicrosoftFaceAPI(PersonReference personReference);
 
     Observable<Void> addFaceOnMicrosoftFaceAPI(ImageReference imageReference);
 

@@ -2,6 +2,7 @@ package com.nosmurf.data.repository.network;
 
 import com.nosmurf.data.model.FaceDto;
 import com.nosmurf.data.model.ImageReference;
+import com.nosmurf.data.model.PersonReference;
 import com.nosmurf.data.model.UserDto;
 import com.nosmurf.data.model.UserRegisteredDtoResponse;
 
@@ -21,8 +22,9 @@ public class SHKNetworkDataSource implements NetworkDataSource {
     }
 
     @Override
-    public Observable<UserRegisteredDtoResponse> createPersonOnMicrosoftFaceAPI(String personGroupId, String name) {
-        return apiService.createPerson(personGroupId, new UserDto(name));
+    public Observable<String> createPersonOnMicrosoftFaceAPI(PersonReference personReference) {
+        return apiService.createPerson(personReference.getGroupId(), new UserDto(personReference.getCurrentUser()))
+                .map(UserRegisteredDtoResponse::getPersonId);
     }
 
     @Override
