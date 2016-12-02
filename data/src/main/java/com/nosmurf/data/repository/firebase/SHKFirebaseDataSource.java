@@ -35,7 +35,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
 
-    private static final String USERS_PATH = "users/";
+    private static final String USERS_PATH = "groups/";
 
     private static final String IMAGES = "IMAGES";
 
