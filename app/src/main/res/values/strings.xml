@@ -15,5 +15,6 @@
     <string name="error_writing_tag">Error when writing tag</string>
     <string name="error_writing_tag_key">Error when writing tag key</string>
     <string name="error_format_tag">Error authenticating tag, please, do factory format</string>
+    <string name="try_again">Try again please</string>
 
 </resources>

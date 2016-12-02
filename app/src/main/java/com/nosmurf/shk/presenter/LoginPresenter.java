@@ -12,6 +12,11 @@ import com.nosmurf.domain.usecase.DoLoginUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.view.activity.RootActivity;
+import com.pro100svitlo.fingerprintAuthHelper.FahErrorType;
+import com.pro100svitlo.fingerprintAuthHelper.FahListener;
+import com.pro100svitlo.fingerprintAuthHelper.FingerprintAuthHelper;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,6 +30,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     private GoogleApiClient googleApiClient;
 
     private DoLoginUseCase doLoginUseCase;
+
+    private FingerprintAuthHelper fingerprintAuthHelper;
 
     @Inject
     public LoginPresenter(@Named("doLoginUseCase") UseCase doLoginUseCase) {
@@ -52,7 +59,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
     @Override
     public void destroy() {
-
+        fingerprintAuthHelper.stopListening();
+        fingerprintAuthHelper.onDestroy();
     }
 
     public void onSignInClick() {
@@ -88,7 +96,39 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     }
 
     public void onContinueClick() {
-        navigator.navigateToNfcActivity((RootActivity) view.getContext());
+        fingerprintAuthHelper = new FingerprintAuthHelper
+                .Builder(view.getContext(),
+                new FahListener() {
+                    @Override
+                    public void onFingerprintStatus(boolean authSuccessful, int errorType, @NotNull CharSequence charSequence) {
+                        if (authSuccessful) {
+                            navigator.navigateToNfcActivity((RootActivity) view.getContext());
+                        } else if (fingerprintAuthHelper != null) {
+                            // do some stuff here in case auth failed
+                            switch (errorType) {
+                                case FahErrorType.General.LOCK_SCREEN_DISABLED:
+                                case FahErrorType.General.NO_FINGERPRINTS:
+                                    fingerprintAuthHelper.showSecuritySettingsDialog();
+                                    break;
+                                case FahErrorType.Auth.AUTH_NOT_RECOGNIZED:
+                                    view.showError(R.string.try_again);
+                                    break;
+                                case FahErrorType.Auth.AUTH_TO_MANY_TRIES:
+                                    view.showError(R.string.try_again);
+                                    break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFingerprintListening(boolean b, long l) {
+                        // Nothing to do
+                    }
+                }).build();
+
+        if (fingerprintAuthHelper.isHardwareEnable()) {
+            fingerprintAuthHelper.startListening();
+        }
     }
 
     public interface View extends Presenter.View {
