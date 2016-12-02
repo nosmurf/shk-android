@@ -19,6 +19,8 @@ import com.nosmurf.shk.internal.di.module.LoginModule;
 import com.nosmurf.shk.presenter.LoginPresenter;
 import com.nosmurf.shk.presenter.Presenter;
 import com.nosmurf.shk.utils.AnimationUtils;
+import com.nosmurf.shk.view.FingerPrintDialog;
+import com.pro100svitlo.fingerprintAuthHelper.FingerprintAuthHelper;
 
 import javax.inject.Inject;
 
@@ -160,5 +162,13 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     @Override
     public void toggleSignInButton(boolean show) {
         signInButton.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void showFingerPrintDialog(FingerPrintDialog.OnFingerPrintDialogListener onFingerPrintDialogListener) {
+        FingerPrintDialog dialog = new FingerPrintDialog();
+        dialog.setParams(onFingerPrintDialogListener);
+        dialog.show(getSupportFragmentManager(), "fragment_container");
+
     }
 }
