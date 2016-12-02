@@ -12,6 +12,13 @@
         android:background="@color/light_green_500"
         android:visibility="invisible" />
 
+    <ImageView
+        android:id="@+id/tap_nfc"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/tap_nfc" />
+
     <android.support.v4.widget.ContentLoadingProgressBar
         android:id="@+id/progress"
         style="?android:attr/progressBarStyleLarge"

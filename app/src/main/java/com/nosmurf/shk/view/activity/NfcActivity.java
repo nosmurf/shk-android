@@ -44,6 +44,9 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
     @Bind(R.id.reveal)
     View reveal;
 
+    @Bind(R.id.tap_nfc)
+    ImageView tapNfc;
+
     @Inject
     NfcPresenter nfcPresenter;
 
@@ -138,6 +141,7 @@ public class NfcActivity extends RootActivity implements NfcPresenter.View {
 
     @Override
     public void showCompletedUI() {
+        tapNfc.setVisibility(View.GONE);
         AnimationUtils.enterReveal(reveal, () -> {
             done.setVisibility(View.VISIBLE);
             continueButton.setVisibility(View.VISIBLE);
