@@ -35,13 +35,15 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
 
-    private static final String USERS_PATH = "groups/";
+    private static final String GROUPS_PATH = "groups/";
 
     private static final String IMAGES = "IMAGES";
 
     private static final String ALGORITHM = "SHA-384";
 
     private static final String KEY = "key";
+
+    private static final String USERS_PATH = "users/";
 
     private final StorageReference storageReference;
 
@@ -75,7 +77,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             @Override
             public Observable<Void> call(Uri uri) {
                 return Observable.create((Subscriber<? super Void> subscriber) -> {
-                    DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+                    DatabaseReference usersReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
                     usersReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             subscriber.onCompleted();
@@ -135,13 +137,16 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         return Observable.create(new Observable.OnSubscribe<Key>() {
             @Override
             public void call(Subscriber<? super Key> subscriber) {
-                DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
-                usersReference.child(KEY).addValueEventListener(new ValueEventListener() {
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
+                groupsReference.child(KEY).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Object value = dataSnapshot.getValue();
                         if (value == null) {
-                            usersReference.child(KEY).setValue(getRandomHexString());
+                            groupsReference.child(KEY).setValue(getRandomHexString());
+                            groupsReference.child(USERS_PATH).setValue(uid);
+                            groupsReference.child(USERS_PATH).child(uid).child("role").setValue("admin");
                         } else {
                             subscriber.onNext(new Key(4, 19, (String) value));
                             subscriber.onCompleted();
