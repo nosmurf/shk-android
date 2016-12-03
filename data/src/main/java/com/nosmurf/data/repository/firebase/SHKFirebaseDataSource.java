@@ -77,8 +77,8 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             @Override
             public Observable<String> call(Uri uri) {
                 return Observable.create((Subscriber<? super String> subscriber) -> {
-                    DatabaseReference usersReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
-                    usersReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
+                    DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+                    groupsReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             subscriber.onNext(uri.toString());
                             subscriber.onCompleted();
@@ -101,6 +101,12 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 subscriber.onNext(true);
+                                String uid = firebaseAuth.getCurrentUser().getUid();
+                                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
+                                groupsReference.child(USERS_PATH).setValue(uid);
+                                groupsReference.child(USERS_PATH).child(uid).child("role").setValue("admin");
+                                groupsReference.child(USERS_PATH).child(uid).child("name").setValue(account.getDisplayName());
+                                groupsReference.child(USERS_PATH).child(uid).child("email").setValue(account.getEmail());
                                 subscriber.onCompleted();
                             } else {
                                 subscriber.onError(task.getException());
@@ -221,8 +227,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                         Object value = dataSnapshot.getValue();
                         if (value == null) {
                             groupsReference.child(KEY).setValue(getRandomHexString());
-                            groupsReference.child(USERS_PATH).setValue(uid);
-                            groupsReference.child(USERS_PATH).child(uid).child("role").setValue("admin");
                         } else {
                             subscriber.onNext(new Key(4, 19, (String) value));
                             subscriber.onCompleted();

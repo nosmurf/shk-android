@@ -73,6 +73,7 @@ public class NfcPresenter extends Presenter<NfcPresenter.View> {
     @Override
     public void destroy() {
         getHashedAuthTokenUseCase.unsubscribe();
+        getKeyUseCase.unsubscribe();
     }
 
     public void onContinueClick() {
