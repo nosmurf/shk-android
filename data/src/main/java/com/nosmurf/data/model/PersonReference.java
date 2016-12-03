@@ -10,6 +10,8 @@ public class PersonReference {
 
     String groupId;
 
+    String microsoftId;
+
     public PersonReference(String currentUser, String groupId) {
         this.currentUser = currentUser;
         this.groupId = groupId;
@@ -29,5 +31,13 @@ public class PersonReference {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getMicrosoftId() {
+        return microsoftId;
+    }
+
+    public void setMicrosoftId(String microsoftId) {
+        this.microsoftId = microsoftId;
     }
 }

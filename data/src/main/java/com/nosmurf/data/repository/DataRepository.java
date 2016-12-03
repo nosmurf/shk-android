@@ -64,9 +64,16 @@ public class DataRepository implements Repository {
                     }
                 })
                 .flatMap(personReference -> {
-                    return networkDataSource.createPersonOnMicrosoftFaceAPI(personReference);
+                    return networkDataSource.createPersonOnMicrosoftFaceAPI(personReference)
+                            .map(new Func1<String, PersonReference>() {
+                                @Override
+                                public PersonReference call(String microsoftId) {
+                                    personReference.setMicrosoftId(microsoftId);
+                                    return personReference;
+                                }
+                            });
                 })
-                .flatMap(microsoftId -> firebaseDataSource.saveMicrosoftId(microsoftId));
+                .flatMap(firebaseDataSource::saveMicrosoftId);
 
 
 

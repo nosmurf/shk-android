@@ -1,6 +1,7 @@
 package com.nosmurf.data.repository.firebase;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.nosmurf.data.model.PersonReference;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
@@ -22,7 +23,7 @@ public interface FirebaseDataSource {
 
     Observable<Boolean> hasMicrosoftId();
 
-    Observable<Void> saveMicrosoftId(String microsoftId);
+    Observable<Void> saveMicrosoftId(PersonReference personReference);
 
     Observable<TokenHashed> getHashedToken();
 

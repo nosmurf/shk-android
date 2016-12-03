@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.nosmurf.data.exception.UserNotFoundException;
+import com.nosmurf.data.model.PersonReference;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
@@ -218,12 +219,12 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Void> saveMicrosoftId(String microsoftId) {
+    public Observable<Void> saveMicrosoftId(PersonReference personReference) {
         return Observable.create(subscriber -> {
-            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + personReference.getGroupId());
             DatabaseReference userReference = groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
             userReference.child("microsoftId")
-                    .setValue(microsoftId)
+                    .setValue(personReference.getMicrosoftId())
                     .addOnCompleteListener(task -> subscriber.onCompleted());
         });
     }
