@@ -95,10 +95,10 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
 
     @Override
-    public Observable<Boolean> doLogin(GoogleSignInAccount account, String parentEmail) {
-        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+    public Observable<String> doLogin(GoogleSignInAccount account, String parentEmail) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
+            public void call(Subscriber<? super String> subscriber) {
                 AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
                 firebaseAuth.signInWithCredential(credential)
                         .addOnCompleteListener(task -> {
@@ -118,6 +118,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                                                 String key = (String) pair.getKey();
                                                 Map<String, Object> value = (HashMap<String, Object>) pair.getValue();
                                                 if (value.get("parentEmail").equals(parentEmail)) {
+                                                    groupsReference.removeEventListener(this);
                                                     insertUser(account, key, uid, "user", subscriber);
                                                 }
                                                 it.remove(); // avoids a ConcurrentModificationException
@@ -132,8 +133,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                                 } else {
                                     insertUser(account, parentUid, uid, "admin", subscriber);
                                 }
-
-                                subscriber.onCompleted();
                             } else {
                                 subscriber.onError(task.getException());
                             }
@@ -142,7 +141,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         });
     }
 
-    private void insertUser(GoogleSignInAccount account, String parentUid, String uid, String role, Subscriber<? super Boolean> subscriber) {
+    private void insertUser(GoogleSignInAccount account, String parentUid, String uid, String role, Subscriber<? super String> subscriber) {
         DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + parentUid);
         if (parentUid.equals(uid)) {
             groupsReference.child("parentEmail").setValue(account.getEmail());
@@ -152,7 +151,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         groupsReference.child(USERS_PATH).child(uid).child("role").setValue(role);
         groupsReference.child(USERS_PATH).child(uid).child("name").setValue(account.getDisplayName());
         groupsReference.child(USERS_PATH).child(uid).child("email").setValue(account.getEmail());
-        subscriber.onNext(true);
+        subscriber.onNext(parentUid);
         subscriber.onCompleted();
     }
 
@@ -162,9 +161,9 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<String> getGroupId() {
+    public Observable<String> getGroupId(String uid) {
         return Observable.create(subscriber -> {
-            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + uid);
             groupReference.child("microsoftGroupId").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -208,7 +207,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             subscriber.onNext(dataSnapshot.getValue(String.class) != null);
-                            subscriber.onCompleted();
                         }
 
                         @Override
@@ -284,12 +282,13 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Boolean> saveMicrosoftGroupId() {
-        DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+    public Observable<String> saveMicrosoftGroupId() {
+        String uid = firebaseAuth.getCurrentUser().getUid();
+        DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + uid);
         return Observable.create(subscriber -> {
-            groupReference.child("microsoftGroupId").setValue(firebaseAuth.getCurrentUser().getUid()).addOnCompleteListener(task -> {
+            groupReference.child("microsoftGroupId").setValue(uid).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    subscriber.onNext(true);
+                    subscriber.onNext(uid);
                     subscriber.onCompleted();
                 }
             }).addOnFailureListener(subscriber::onError);
@@ -297,12 +296,13 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Boolean> hasGroupOnMicrosoft() {
-        DatabaseReference usersReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+    public Observable<Boolean> hasGroupOnMicrosoft(String uid) {
         return Observable.create(subscriber -> {
-            usersReference.child("microsoftGroupId").addValueEventListener(new ValueEventListener() {
+            DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
+            ValueEventListener valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    groupsReference.removeEventListener(this);
                     subscriber.onNext(dataSnapshot.getValue(String.class) != null);
                     subscriber.onCompleted();
                 }
@@ -311,7 +311,8 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 public void onCancelled(DatabaseError databaseError) {
                     subscriber.onError(databaseError.toException());
                 }
-            });
+            };
+            groupsReference.child("microsoftGroupId").addValueEventListener(valueEventListener);
         });
     }
 

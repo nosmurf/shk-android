@@ -33,52 +33,43 @@ public class DataRepository implements Repository {
     @Override
     public Observable<Void> uploadPhoto(String imagePath) {
         return Observable
-                .zip(firebaseDataSource.uploadPhoto(imagePath), firebaseDataSource.getGroupId(), firebaseDataSource.getPersonId(),
+                .zip(firebaseDataSource.uploadPhoto(imagePath), firebaseDataSource.getGroupId(null), firebaseDataSource.getPersonId(),
                         ImageReference::new)
-                .flatMap(imageReference -> networkDataSource.addFaceOnMicrosoftFaceAPI(imageReference));
+                .flatMap(new Func1<ImageReference, Observable<Void>>() {
+                    @Override
+                    public Observable<Void> call(ImageReference imageReference) {
+                        return Observable.empty();
+                    }
+                });
+        //.flatMap(imageReference -> networkDataSource.addFaceOnMicrosoftFaceAPI(imageReference));
     }
 
     @Override
     public Observable<Void> doLogin(GoogleSignInAccount account, String parentEmail) {
 
-        return firebaseDataSource.doLogin(account, parentEmail).flatMap(new Func1<Boolean, Observable<Boolean>>() {
-            @Override
-            public Observable<Boolean> call(Boolean aBoolean) {
-                return firebaseDataSource.hasGroupOnMicrosoft();
-            }
-        })
-                .filter((hasGroup) -> !hasGroup)
-                .flatMap(new Func1<Boolean, Observable<String>>() {
+        return firebaseDataSource.doLogin(account, parentEmail)
+                .flatMap(new Func1<String, Observable<PersonReference>>() {
                     @Override
-                    public Observable<String> call(Boolean aBoolean) {
-                        return firebaseDataSource.getCurrentUser();
-                    }
-                }).flatMap(new Func1<String, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(String userId) {
-                        return networkDataSource.createGroupOnMicrosoftFaceAPI(userId);
-                    }
-                }).flatMap(new Func1<String, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> call(String s) {
-                        return firebaseDataSource.saveMicrosoftGroupId();
+                    public Observable<PersonReference> call(String userId) {
+                        return firebaseDataSource.hasGroupOnMicrosoft(userId)
+                                .flatMap(hasMicrosoftGroup -> {
+                                    if (hasMicrosoftGroup) {
+                                        return Observable.just(new PersonReference(userId, userId));
+                                    } else {
+                                        return networkDataSource.createGroupOnMicrosoftFaceAPI(userId)
+                                                .flatMap(s -> firebaseDataSource.saveMicrosoftGroupId())
+                                                .map(groupId -> new PersonReference(userId, groupId));
+                                    }
+                                });
                     }
                 })
-                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> call(Boolean aBoolean) {
-                        return firebaseDataSource.hasMicrosoftId();
-                    }
-                }).filter((aBoolean1) -> !aBoolean1)
-                .flatMap(new Func1<Boolean, Observable<Void>>() {
-                    @Override
-                    public Observable<Void> call(Boolean aBoolean) {
-                        return Observable.zip(firebaseDataSource.getCurrentUser(), firebaseDataSource.getGroupId(),
-                                PersonReference::new)
-                                .flatMap(personReference -> networkDataSource.createPersonOnMicrosoftFaceAPI(personReference))
-                                .flatMap(microsoftId -> firebaseDataSource.saveMicrosoftId(microsoftId));
-                    }
-                });
+                .flatMap(personReference -> {
+                    return networkDataSource.createPersonOnMicrosoftFaceAPI(personReference);
+                })
+                .flatMap(microsoftId -> firebaseDataSource.saveMicrosoftId(microsoftId));
+
+
+
     }
 
     @Override

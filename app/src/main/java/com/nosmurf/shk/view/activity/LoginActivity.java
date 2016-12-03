@@ -152,6 +152,8 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     public void showCompletedUI() {
         hideProgress();
 
+        email.setVisibility(View.GONE);
+
         AnimationUtils.enterReveal(reveal, () -> {
             done.setVisibility(View.VISIBLE);
             continueButton.setVisibility(View.VISIBLE);
