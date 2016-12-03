@@ -5,5 +5,17 @@
 
     <!-- Exception Messages -->
     <string name="exception_message_generic">There was an application error</string>
+    <string name="server_client_id">36492923646-tjm945in7nrq9smi14aje0juqg0frfkf.apps.googleusercontent.com</string>
+    <string name="continue_text">Continue</string>
+    <string name="google_signin_error">Error when sign in into Google</string>
+    <string name="loging">Trying to do login...</string>
+    <string name="tag_detected">Tag detected, encrypting...</string>
+    <string name="error_reading_tag">Error when reading tag</string>
+    <string name="error_auth">Error on auth with tag</string>
+    <string name="error_writing_tag">Error when writing tag</string>
+    <string name="error_writing_tag_key">Error when writing tag key</string>
+    <string name="error_format_tag">Error authenticating tag, please, do factory format</string>
+    <string name="try_again">Try again please</string>
+    <string name="fingerprint_found">Please, put your fingerprint</string>
 
 </resources>

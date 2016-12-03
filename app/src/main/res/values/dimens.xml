@@ -5,4 +5,5 @@
     <dimen name="fab">56dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="recyclerview_margin">5dp</dimen>
+    <dimen name="done_size">100dp</dimen>
 </resources>
