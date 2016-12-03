@@ -11,6 +11,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.nosmurf.domain.usecase.DoLoginUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.R;
+import com.nosmurf.shk.view.FingerPrintDialog;
 import com.nosmurf.shk.view.activity.RootActivity;
 
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
     @Override
     public void destroy() {
-
+        doLoginUseCase.unsubscribe();
     }
 
     public void onSignInClick() {
@@ -88,12 +89,37 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     }
 
     public void onContinueClick() {
-        navigator.navigateToNfcActivity((RootActivity) view.getContext());
+        view.showFingerPrintDialog(new FingerPrintDialog.OnFingerPrintDialogListener() {
+            @Override
+            public void onFingerPrintSuccess(FingerPrintDialog dialog) {
+                dialog.dismiss();
+                navigator.navigateToNfcActivity((RootActivity) view.getContext());
+            }
+
+            @Override
+            public void onFingerPrintError(FingerPrintDialog dialog) {
+                view.showError(R.string.try_again);
+            }
+
+            @Override
+            public void onFingerPrintFinalError(FingerPrintDialog dialog) {
+                dialog.dismiss();
+                navigator.navigateToNfcActivity((RootActivity) view.getContext());
+            }
+
+            @Override
+            public void onFingerPrintNotSupported(FingerPrintDialog dialog) {
+                dialog.dismiss();
+                navigator.navigateToNfcActivity((RootActivity) view.getContext());
+            }
+        });
     }
 
     public interface View extends Presenter.View {
         void showCompletedUI();
 
         void toggleSignInButton(boolean show);
+
+        void showFingerPrintDialog(FingerPrintDialog.OnFingerPrintDialogListener onFingerPrintDialogListener);
     }
 }
