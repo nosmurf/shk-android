@@ -50,6 +50,8 @@ dependencies {
     compile appDependencies.fingerprint
     compile appDependencies.butterKnife
 
+    compile appDependencies.dexter
+
     compile appDependencies.rxJava
     compile appDependencies.rxAndroid
 

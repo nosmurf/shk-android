@@ -1,8 +1,14 @@
 package com.nosmurf.shk.presenter;
 
+import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.nosmurf.domain.usecase.UploadPhotoUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.exception.ExceptionManager;
@@ -16,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -78,13 +85,26 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
     }
 
     public void takeAPhoto(int requestImageCapture) {
-        try {
-            File file = FileUtils.createImageFile();
-            photoPath = file.getPath();
-            navigator.navigateToCameraActivity((RootActivity) view, file, requestImageCapture);
-        } catch (IOException e) {
-            view.showError(ExceptionManager.convert(e));
-        }
+        Dexter.checkPermissions(
+                new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            try {
+                                File file = FileUtils.createImageFile();
+                                photoPath = file.getPath();
+                                navigator.navigateToCameraActivity((RootActivity) view, file, requestImageCapture);
+                            } catch (IOException e) {
+                                view.showError(ExceptionManager.convert(e));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+
+                    }
+                }, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA);
     }
 
     public void showAndUploadPhoto() {
