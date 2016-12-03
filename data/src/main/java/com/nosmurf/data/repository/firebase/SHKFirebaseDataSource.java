@@ -38,11 +38,12 @@ import rx.functions.Func1;
 public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
+
     private static final String GROUP_ID = "";
 
     private static final String GROUPS_PATH = "groups/";
 
-    private static final String IMAGES = "IMAGES";
+    private static final String IMAGES = "images";
 
     private static final String ALGORITHM = "SHA-384";
 
@@ -64,14 +65,17 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<String> uploadPhoto(String imagePath) {
+    public Observable<String> uploadPhoto(String homeId, String imagePath) {
         File image = new File(imagePath);
         Uri uri = Uri.fromFile(image);
 
-        final StorageReference userPhotosRef = storageReference.child(firebaseAuth.getCurrentUser().getUid()).child(uri.getLastPathSegment());
+        String userId = firebaseAuth.getCurrentUser().getUid();
+
+        final StorageReference groupPhotoReference = storageReference.child(GROUP_ID + homeId);
+        groupPhotoReference.child(USERS_PATH + userId).child(uri.getLastPathSegment());
 
         return Observable.create((Subscriber<? super Uri> subscriber) -> {
-            userPhotosRef.putFile(uri)
+            groupPhotoReference.putFile(uri)
                     .addOnSuccessListener(task -> {
                         subscriber.onNext(task.getDownloadUrl());
                         subscriber.onCompleted();
@@ -81,8 +85,9 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             @Override
             public Observable<String> call(Uri uri) {
                 return Observable.create((Subscriber<? super String> subscriber) -> {
-                    DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
-                    groupsReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
+                    DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + homeId);
+                    DatabaseReference userReference = groupsReference.child(USERS_PATH + userId);
+                    userReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             subscriber.onNext(uri.toString());
                             subscriber.onCompleted();
@@ -181,21 +186,22 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<String> getPersonId() {
+    public Observable<String> getPersonId(String groupId) {
         return Observable.create(subscriber -> {
-            databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            subscriber.onNext(dataSnapshot.getValue(String.class));
-                            subscriber.onCompleted();
-                        }
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + groupId);
+            DatabaseReference userReference = groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+            userReference.child("microsoftId").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    subscriber.onNext(dataSnapshot.getValue(String.class));
+                    subscriber.onCompleted();
+                }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            subscriber.onError(databaseError.toException());
-                        }
-                    });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    subscriber.onError(databaseError.toException());
+                }
+            });
         });
     }
 

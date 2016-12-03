@@ -9,7 +9,7 @@ import rx.Observable;
 
 public interface FirebaseDataSource {
 
-    Observable<String> uploadPhoto(String imagePath);
+    Observable<String> uploadPhoto(String homeId, String imagePath);
 
     Observable<String> doLogin(GoogleSignInAccount account, String parentEmail);
 
@@ -19,7 +19,7 @@ public interface FirebaseDataSource {
 
     Observable<String> getGroupId(String uid);
 
-    Observable<String> getPersonId();
+    Observable<String> getPersonId(String groupId);
 
     Observable<Boolean> hasMicrosoftId();
 

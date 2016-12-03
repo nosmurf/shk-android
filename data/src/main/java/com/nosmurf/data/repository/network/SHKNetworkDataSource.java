@@ -34,7 +34,7 @@ public class SHKNetworkDataSource implements NetworkDataSource {
                 .flatMap(new Func1<Void, Observable<String>>() {
                     @Override
                     public Observable<String> call(Void aVoid) {
-                        return Observable.just(groupIdLowerCase);
+                        return Observable.just(groupId);
                     }
                 });
     }
@@ -51,6 +51,8 @@ public class SHKNetworkDataSource implements NetworkDataSource {
     public Observable<Void> addFaceOnMicrosoftFaceAPI(ImageReference imageReference) {
         return apiService.addFace(imageReference.getGroupId().toLowerCase(), imageReference.getPersonId(),
                 new FaceDto(imageReference.getImageUrl()))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(persistedFaceDtoResponse -> Observable.empty());
     }
 }
