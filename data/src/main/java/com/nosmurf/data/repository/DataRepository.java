@@ -5,7 +5,11 @@ import com.nosmurf.data.model.ImageReference;
 import com.nosmurf.data.model.PersonReference;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
 import com.nosmurf.data.repository.network.NetworkDataSource;
+import com.nosmurf.domain.model.Key;
+import com.nosmurf.domain.model.TokenHashed;
 import com.nosmurf.domain.repository.Repository;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -53,5 +57,21 @@ public class DataRepository implements Repository {
                                 .flatMap(microsoftId -> firebaseDataSource.saveMicrosoftId(microsoftId));
                     }
                 });
+    }
+
+    @Override
+    public Observable<TokenHashed> getHashedToken() {
+        return firebaseDataSource.getHashedToken();
+    }
+
+    @Override
+    public Observable<Key> getKey() {
+        return firebaseDataSource.getKey();
+    }
+
+    @Override
+    public Observable<Boolean> hasCurrentUser() {
+        return firebaseDataSource.hasCurrentUser()
+                .delay(500, TimeUnit.MILLISECONDS);
     }
 }

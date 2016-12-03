@@ -1,11 +1,8 @@
 package com.nosmurf.data.repository.firebase;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,8 +15,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.nosmurf.data.exception.UserNotFoundException;
+import com.nosmurf.domain.model.Key;
+import com.nosmurf.domain.model.TokenHashed;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -31,6 +35,14 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
     private static final String GROUP_ID = "";
+
+    private static final String USERS_PATH = "groups/";
+
+    private static final String IMAGES = "IMAGES";
+
+    private static final String ALGORITHM = "SHA-384";
+
+    private static final String KEY = "key";
 
     private final StorageReference storageReference;
 
@@ -64,8 +76,8 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             @Override
             public Observable<String> call(Uri uri) {
                 return Observable.create((Subscriber<? super String> subscriber) -> {
-                    DatabaseReference usersReference = databaseReference.child("users/" + firebaseAuth.getCurrentUser().getUid());
-                    usersReference.child("images").push().setValue(uri.toString()).addOnCompleteListener(task -> {
+                    DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+                    usersReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             subscriber.onNext(uri.toString());
                             subscriber.onCompleted();
@@ -166,6 +178,69 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                     .setValue(microsoftId)
                     .addOnCompleteListener(task -> subscriber.onCompleted());
         });
+    }
+
+    @Override
+    public Observable<TokenHashed> getHashedToken() {
+        return Observable.create((Subscriber<? super TokenHashed> subscriber) -> {
+            String token = firebaseAuth.getCurrentUser().getUid();
+            try {
+                MessageDigest messageDigest = MessageDigest.getInstance(ALGORITHM);
+                for (byte b : token.getBytes()) {
+                    messageDigest.update(b);
+                }
+
+                // FIXME: 01/12/2016 remove hardcoded numbers
+                subscriber.onNext(new TokenHashed(16, Arrays.copyOfRange(messageDigest.digest(), 0, 16)));
+                subscriber.onNext(new TokenHashed(17, Arrays.copyOfRange(messageDigest.digest(), 16, 32)));
+                subscriber.onNext(new TokenHashed(18, Arrays.copyOfRange(messageDigest.digest(), 32, 48)));
+
+                subscriber.onCompleted();
+
+            } catch (NoSuchAlgorithmException exception) {
+                subscriber.onError(exception);
+            }
+
+        }).delay(100, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public Observable<Key> getKey() {
+        return Observable.create(new Observable.OnSubscribe<Key>() {
+            @Override
+            public void call(Subscriber<? super Key> subscriber) {
+                DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+                usersReference.child(KEY).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Object value = dataSnapshot.getValue();
+                        if (value == null) {
+                            usersReference.child(KEY).setValue(getRandomHexString());
+                        } else {
+                            subscriber.onNext(new Key(4, 19, (String) value));
+                            subscriber.onCompleted();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        subscriber.onError(new RuntimeException(databaseError.getMessage()));
+                    }
+                });
+
+            }
+        });
+    }
+
+    private String getRandomHexString() {
+        Random random = new Random();
+        StringBuffer sb = new StringBuffer();
+        int nBytes = 12;
+        while (sb.length() < nBytes) {
+            sb.append(Integer.toHexString(random.nextInt()));
+        }
+
+        return sb.toString().substring(0, nBytes);
     }
 
     @Override

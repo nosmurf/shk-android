@@ -87,8 +87,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
         }
     }
 
-    public void goToMainActivity() {
-        navigator.navigateToMainActivity((RootActivity) view);
+    public void onContinueClick() {
+        navigator.navigateToNfcActivity((RootActivity) view.getContext());
     }
 
     public interface View extends Presenter.View {
