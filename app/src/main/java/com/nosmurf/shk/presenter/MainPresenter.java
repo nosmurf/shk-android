@@ -8,6 +8,11 @@ import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.exception.ExceptionManager;
 import com.nosmurf.shk.utils.FileUtils;
 import com.nosmurf.shk.view.activity.RootActivity;
+import com.pro100svitlo.fingerprintAuthHelper.FahErrorType;
+import com.pro100svitlo.fingerprintAuthHelper.FahListener;
+import com.pro100svitlo.fingerprintAuthHelper.FingerprintAuthHelper;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +26,8 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     private String photoPath;
 
+    private FingerprintAuthHelper fingerprintAuthHelper;
+
     @Inject
     public MainPresenter(@Named("uploadPhotoUseCase") UseCase uploadPhotoUseCase) {
         this.uploadPhotoUseCase = (UploadPhotoUseCase) uploadPhotoUseCase;
@@ -28,7 +35,41 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     @Override
     public void initialize() {
+        fingerprintAuthHelper = new FingerprintAuthHelper
+                .Builder(view.getContext(),
+                new FahListener() {
+                    @Override
+                    public void onFingerprintStatus(boolean authSuccessful, int errorType, @NotNull CharSequence charSequence) {
+                        if (authSuccessful) {
+                            view.showFingerPrintSuccess();
+                        } else if (fingerprintAuthHelper != null) {
+                            // do some stuff here in case auth failed
+                            switch (errorType) {
+                                case FahErrorType.General.LOCK_SCREEN_DISABLED:
+                                case FahErrorType.General.NO_FINGERPRINTS:
+                                    fingerprintAuthHelper.showSecuritySettingsDialog();
+                                    break;
+                                case FahErrorType.Auth.AUTH_NOT_RECOGNIZED:
+                                    view.showFingerPrintError();
+                                    break;
+                                case FahErrorType.Auth.AUTH_TO_MANY_TRIES:
+                                    view.showFingerPrintError();
+                                    break;
+                            }
+                        }
+                    }
 
+                    @Override
+                    public void onFingerprintListening(boolean b, long l) {
+                        // Nothing to do
+                    }
+                }).build();
+
+        if (fingerprintAuthHelper.isFingerprintEnrolled()) {
+            fingerprintAuthHelper.startListening();
+        } else {
+            view.showNormalUI();
+        }
     }
 
     @Override
@@ -55,6 +96,12 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     public interface View extends Presenter.View {
         void showImage(Bitmap bitmap);
+
+        void showNormalUI();
+
+        void showFingerPrintSuccess();
+
+        void showFingerPrintError();
     }
 
     private class UploadPhotoSubscriber extends PresenterSubscriber<Void> {
