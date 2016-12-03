@@ -41,4 +41,11 @@ public interface ApiService {
     Observable<PersistedFaceDtoResponse> addFace(@Path("personGroupId") String personGroupId, @Path("personId") String personId, @Body FaceDto faceDto);
 
 
+    @Headers({
+            "Ocp-Apim-Subscription-Key: " + API_KEY
+    })
+    @POST("persongroups/{personGroupId}/train")
+    Observable<Void> trainPersonGroup(@Path("personGroupId") String personGroupId);
+
+
 }

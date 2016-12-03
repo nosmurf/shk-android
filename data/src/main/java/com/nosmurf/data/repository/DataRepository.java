@@ -40,7 +40,6 @@ public class DataRepository implements Repository {
         return Observable.zip(firebaseDataSource.uploadPhoto(homeId, imagePath), firebaseDataSource.getPersonId(homeId),
                 (imageUrl, microsoftId) -> new ImageReference(imageUrl, homeId, microsoftId))
                 .flatMap(imageReference -> networkDataSource.addFaceOnMicrosoftFaceAPI(imageReference));
-        // TODO: 03/12/2016 train API 
     }
 
     @Override
@@ -49,18 +48,19 @@ public class DataRepository implements Repository {
         return firebaseDataSource.doLogin(account, parentEmail)
                 .flatMap(new Func1<String, Observable<PersonReference>>() {
                     @Override
-                    public Observable<PersonReference> call(String userId) {
-                        return firebaseDataSource.hasGroupOnMicrosoft(userId)
+                    public Observable<PersonReference> call(String parentId) {
+                        return firebaseDataSource.hasGroupOnMicrosoft(parentId)
                                 .flatMap(hasMicrosoftGroup -> {
                                     if (hasMicrosoftGroup) {
-                                        return Observable.just(new PersonReference(userId, userId));
+                                        persistenceDataSource.setHomeId(parentId);
+                                        return Observable.just(new PersonReference(parentId, parentId));
                                     } else {
-                                        return networkDataSource.createGroupOnMicrosoftFaceAPI(userId)
+                                        return networkDataSource.createGroupOnMicrosoftFaceAPI(parentId)
                                                 .flatMap(microsoftGroupId -> {
                                                     persistenceDataSource.setHomeId(microsoftGroupId);
                                                     return firebaseDataSource.saveMicrosoftGroupId();
                                                 })
-                                                .map(groupId -> new PersonReference(userId, groupId));
+                                                .map(groupId -> new PersonReference(parentId, groupId));
                                     }
                                 });
                     }

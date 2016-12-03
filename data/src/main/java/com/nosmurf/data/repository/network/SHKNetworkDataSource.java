@@ -2,6 +2,7 @@ package com.nosmurf.data.repository.network;
 
 import com.nosmurf.data.model.FaceDto;
 import com.nosmurf.data.model.ImageReference;
+import com.nosmurf.data.model.PersistedFaceDtoResponse;
 import com.nosmurf.data.model.PersonGroupDto;
 import com.nosmurf.data.model.PersonReference;
 import com.nosmurf.data.model.UserDto;
@@ -53,6 +54,13 @@ public class SHKNetworkDataSource implements NetworkDataSource {
                 new FaceDto(imageReference.getImageUrl()))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(persistedFaceDtoResponse -> Observable.empty());
+                .flatMap(new Func1<PersistedFaceDtoResponse, Observable<Void>>() {
+                    @Override
+                    public Observable<Void> call(PersistedFaceDtoResponse persistedFaceDtoResponse) {
+                        return apiService.trainPersonGroup(imageReference.getGroupId().toLowerCase())
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread());
+                    }
+                });
     }
 }
