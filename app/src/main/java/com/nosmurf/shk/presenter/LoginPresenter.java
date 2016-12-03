@@ -1,6 +1,12 @@
 package com.nosmurf.shk.presenter;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.auth.api.Auth;
@@ -89,30 +95,42 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
     }
 
     public void onContinueClick() {
-        view.showFingerPrintDialog(new FingerPrintDialog.OnFingerPrintDialogListener() {
-            @Override
-            public void onFingerPrintSuccess(FingerPrintDialog dialog) {
-                dialog.dismiss();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //Fingerprint API only available on from Android 6.0 (M)
+            FingerprintManager fingerprintManager = (FingerprintManager) view.getContext().getSystemService(Context.FINGERPRINT_SERVICE);
+            if (ActivityCompat.checkSelfPermission(view.getContext(), Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            } else if (fingerprintManager.isHardwareDetected()) {
+                // Device doesn't support fingerprint authentication
+                view.showFingerPrintDialog(new FingerPrintDialog.OnFingerPrintDialogListener() {
+                    @Override
+                    public void onFingerPrintSuccess(FingerPrintDialog dialog) {
+                        dialog.dismiss();
+                        navigator.navigateToNfcActivity((RootActivity) view.getContext());
+                    }
+
+                    @Override
+                    public void onFingerPrintError(FingerPrintDialog dialog) {
+                        view.showError(R.string.try_again);
+                    }
+
+                    @Override
+                    public void onFingerPrintFinalError(FingerPrintDialog dialog) {
+                        dialog.dismiss();
+                        navigator.navigateToNfcActivity((RootActivity) view.getContext());
+                    }
+
+                    @Override
+                    public void onFingerPrintNotSupported(FingerPrintDialog dialog) {
+                        dialog.dismiss();
+                        navigator.navigateToNfcActivity((RootActivity) view.getContext());
+                    }
+                });
+            } else {
                 navigator.navigateToNfcActivity((RootActivity) view.getContext());
             }
+        }
 
-            @Override
-            public void onFingerPrintError(FingerPrintDialog dialog) {
-                view.showError(R.string.try_again);
-            }
-
-            @Override
-            public void onFingerPrintFinalError(FingerPrintDialog dialog) {
-                dialog.dismiss();
-                navigator.navigateToNfcActivity((RootActivity) view.getContext());
-            }
-
-            @Override
-            public void onFingerPrintNotSupported(FingerPrintDialog dialog) {
-                dialog.dismiss();
-                navigator.navigateToNfcActivity((RootActivity) view.getContext());
-            }
-        });
     }
 
     public interface View extends Presenter.View {

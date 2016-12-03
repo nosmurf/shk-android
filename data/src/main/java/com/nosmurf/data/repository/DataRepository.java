@@ -82,7 +82,7 @@ public class DataRepository implements Repository {
 
     @Override
     public Observable<Key> getKey() {
-        return firebaseDataSource.getKey();
+        return firebaseDataSource.getKey(persistenceDataSource.getHomeId());
     }
 
     @Override
