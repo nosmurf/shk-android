@@ -44,7 +44,30 @@ public class DataRepository implements Repository {
         return firebaseDataSource.doLogin(account)
                 .flatMap(new Func1<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(Boolean logged) {
+                    public Observable<Boolean> call(Boolean aBoolean) {
+                        return firebaseDataSource.hasGroupOnMicrosoft();
+                    }
+                })
+                .filter((hasGroup) -> !hasGroup)
+                .flatMap(new Func1<Boolean, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Boolean aBoolean) {
+                        return firebaseDataSource.getCurrentUser();
+                    }
+                }).flatMap(new Func1<String, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(String userId) {
+                        return networkDataSource.createGroupOnMicrosoftFaceAPI(userId);
+                    }
+                }).flatMap(new Func1<String, Observable<Void>>() {
+                    @Override
+                    public Observable<Void> call(String s) {
+                        return firebaseDataSource.saveMicrosoftGroupId();
+                    }
+                })
+                .flatMap(new Func1<Void, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Void aVoid) {
                         return firebaseDataSource.hasMicrosoftId();
                     }
                 }).filter((aBoolean1) -> !aBoolean1)

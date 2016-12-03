@@ -28,4 +28,7 @@ public interface FirebaseDataSource {
 
     Observable<Key> getKey();
 
+    Observable<Void> saveMicrosoftGroupId();
+
+    Observable<Boolean> hasGroupOnMicrosoft();
 }

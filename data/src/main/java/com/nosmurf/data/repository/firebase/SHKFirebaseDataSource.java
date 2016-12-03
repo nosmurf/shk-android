@@ -50,7 +50,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     private final DatabaseReference databaseReference;
 
-
     @Inject
     public SHKFirebaseDataSource() {
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -229,6 +228,37 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 });
 
             }
+        });
+    }
+
+    @Override
+    public Observable<Void> saveMicrosoftGroupId() {
+        DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+        return Observable.create(subscriber -> {
+            usersReference.child("microsoftGroupId").setValue(firebaseAuth.getCurrentUser().getUid()).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    subscriber.onCompleted();
+                }
+            }).addOnFailureListener(subscriber::onError);
+        });
+    }
+
+    @Override
+    public Observable<Boolean> hasGroupOnMicrosoft() {
+        DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+        return Observable.create(subscriber -> {
+            usersReference.child("microsoftGroupId").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    subscriber.onNext(dataSnapshot.getValue(String.class) != null);
+                    subscriber.onCompleted();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    subscriber.onError(databaseError.toException());
+                }
+            });
         });
     }
 
