@@ -5,6 +5,8 @@ import android.content.Context;
 import com.nosmurf.data.repository.DataRepository;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
 import com.nosmurf.data.repository.firebase.SHKFirebaseDataSource;
+import com.nosmurf.data.repository.network.NetworkDataSource;
+import com.nosmurf.data.repository.network.SHKNetworkDataSource;
 import com.nosmurf.domain.executor.PostExecutionThread;
 import com.nosmurf.domain.repository.Repository;
 import com.nosmurf.shk.UIThread;
@@ -46,6 +48,12 @@ public class AppModule {
     @Singleton
     FirebaseDataSource provideFirebaseDataSource(SHKFirebaseDataSource shkFirebaseDataSource) {
         return shkFirebaseDataSource;
+    }
+
+    @Provides
+    @Singleton
+    NetworkDataSource provideNetworkDataSource(SHKNetworkDataSource shkNetworkDataSource) {
+        return shkNetworkDataSource;
     }
 
 }

@@ -46,12 +46,11 @@ dependencies {
     compile appDependencies.design
     compile appDependencies.support
 
+    compile appDependencies.playServices
+    compile appDependencies.fingerprint
     compile appDependencies.butterKnife
 
     compile appDependencies.rxJava
-    compile appDependencies.rxJava2
-    compile appDependencies.rxAndroid
-    compile appDependencies.rxFingerPrint
     compile appDependencies.rxAndroid
 
     apt appDependencies.daggerCompiler

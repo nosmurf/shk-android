@@ -26,6 +26,7 @@ ext {
     gsonVersion = '2.7'
     rxFingerPrintVersion = '2.0.0'
     firebaseVersion = '9.6.1'
+    fingerPrintVersion = '1.1.7'
 
     //RetroLambda
     retroLambda = 'me.tatarka.retrolambda'
@@ -43,14 +44,15 @@ ext {
             design         : "com.android.support:design:${appcompatVersion}",
             recycler       : "com.android.support:recyclerview-v7:${appcompatVersion}",
             rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
-            rxJava2        : "io.reactivex.rxjava2:rxjava:${rxJava2Version}",
             daggerCompiler : "com.google.dagger:dagger-compiler:${daggerVersion}",
             dagger         : "com.google.dagger:dagger:${daggerVersion}",
             butterKnife    : "com.jakewharton:butterknife:${butterKnifeVersion}",
             rxAndroid      : "io.reactivex:rxandroid:${rxAndroidVersion}",
             javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
-            rxFingerPrint  : "com.mtramin:rxfingerprint:${rxFingerPrintVersion}",
-            retroLambda    : "${retroLambda}"
+            retroLambda    : "${retroLambda}",
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}",
+            fingerprint    : "com.github.pro100svitlo:fingerprintAuthHelper:${fingerPrintVersion}"
+
     ]
 
     appTestDependencies = [
@@ -63,7 +65,8 @@ ext {
             rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
             javaxInject    : "javax.inject:javax.inject:${javaxInjectVersion}",
             javaxAnnotation: "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
-            retroLambda    : "${retroLambda}"
+            retroLambda    : "${retroLambda}",
+            playServices   : "com.google.android.gms:play-services-auth:${firebaseVersion}"
     ]
 
     domainTestDependencies = [
@@ -72,13 +75,15 @@ ext {
     ]
 
     dataDependencies = [
-            rxJava         : "io.reactivex:rxjava:${rxJavaVersion}",
-            gson           : "com.google.code.gson:gson:${gsonVersion}",
-            retrofit       : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
-            gsonRetrofit   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
-            rxRetrofit     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
-            retroLambda    : "${retroLambda}",
-            firebaseStorage: "com.google.firebase:firebase-storage:${firebaseVersion}"
+            rxJava          : "io.reactivex:rxjava:${rxJavaVersion}",
+            gson            : "com.google.code.gson:gson:${gsonVersion}",
+            retrofit        : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+            gsonRetrofit    : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
+            rxRetrofit      : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+            retroLambda     : "${retroLambda}",
+            firebaseStorage : "com.google.firebase:firebase-storage:${firebaseVersion}",
+            firebaseAuth    : "com.google.firebase:firebase-auth:${firebaseVersion}",
+            firebaseDatabase: "com.google.firebase:firebase-database:${firebaseVersion}"
     ]
 
     dataTestDependencies = [
