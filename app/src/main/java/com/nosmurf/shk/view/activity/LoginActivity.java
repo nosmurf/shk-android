@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.SignInButton;
@@ -55,6 +56,9 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Bind(R.id.email)
     EditText email;
+
+    @Bind(R.id.image_container)
+    LinearLayout emailContainer;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -152,7 +156,7 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     public void showCompletedUI() {
         hideProgress();
 
-        email.setVisibility(View.GONE);
+        emailContainer.setVisibility(View.GONE);
 
         AnimationUtils.enterReveal(reveal, () -> {
             done.setVisibility(View.VISIBLE);

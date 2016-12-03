@@ -12,6 +12,7 @@
         android:visibility="invisible" />
 
     <LinearLayout
+        android:id="@+id/image_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -26,7 +27,7 @@
 
         <EditText
             android:id="@+id/email"
-            android:layout_width="200dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="46dp"
             android:hint="@string/email_text"
