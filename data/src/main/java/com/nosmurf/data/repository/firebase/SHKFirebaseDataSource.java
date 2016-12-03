@@ -118,11 +118,11 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     @Override
     public Observable<String> getGroupId() {
         return Observable.create(subscriber -> {
-            databaseReference.child("groupId").addValueEventListener(new ValueEventListener() {
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+            groupReference.child("microsoftGroupId").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String groupId = dataSnapshot.getValue(String.class);
-                    subscriber.onNext(groupId);
+                    subscriber.onNext(dataSnapshot.getValue(String.class));
                     subscriber.onCompleted();
                 }
 
@@ -156,7 +156,8 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     @Override
     public Observable<Boolean> hasMicrosoftId() {
         return Observable.create(subscriber -> {
-            databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+            groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -175,7 +176,9 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     @Override
     public Observable<Void> saveMicrosoftId(String microsoftId) {
         return Observable.create(subscriber -> {
-            databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+            DatabaseReference userReference = groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+            userReference.child("microsoftId")
                     .setValue(microsoftId)
                     .addOnCompleteListener(task -> subscriber.onCompleted());
         });
@@ -237,11 +240,12 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Void> saveMicrosoftGroupId() {
-        DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+    public Observable<Boolean> saveMicrosoftGroupId() {
+        DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
         return Observable.create(subscriber -> {
-            usersReference.child("microsoftGroupId").setValue(firebaseAuth.getCurrentUser().getUid()).addOnCompleteListener(task -> {
+            groupReference.child("microsoftGroupId").setValue(firebaseAuth.getCurrentUser().getUid()).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+                    subscriber.onNext(true);
                     subscriber.onCompleted();
                 }
             }).addOnFailureListener(subscriber::onError);
@@ -250,7 +254,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     @Override
     public Observable<Boolean> hasGroupOnMicrosoft() {
-        DatabaseReference usersReference = databaseReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+        DatabaseReference usersReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
         return Observable.create(subscriber -> {
             usersReference.child("microsoftGroupId").addValueEventListener(new ValueEventListener() {
                 @Override

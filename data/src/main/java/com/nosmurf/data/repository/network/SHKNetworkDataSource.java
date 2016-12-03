@@ -41,7 +41,7 @@ public class SHKNetworkDataSource implements NetworkDataSource {
 
     @Override
     public Observable<String> createPersonOnMicrosoftFaceAPI(PersonReference personReference) {
-        return apiService.createPerson(personReference.getGroupId(), new UserDto(personReference.getCurrentUser()))
+        return apiService.createPerson(personReference.getGroupId().toLowerCase(), new UserDto(personReference.getCurrentUser()))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(UserRegisteredDtoResponse::getPersonId);
@@ -49,7 +49,7 @@ public class SHKNetworkDataSource implements NetworkDataSource {
 
     @Override
     public Observable<Void> addFaceOnMicrosoftFaceAPI(ImageReference imageReference) {
-        return apiService.addFace(imageReference.getGroupId(), imageReference.getPersonId(),
+        return apiService.addFace(imageReference.getGroupId().toLowerCase(), imageReference.getPersonId(),
                 new FaceDto(imageReference.getImageUrl()))
                 .flatMap(persistedFaceDtoResponse -> Observable.empty());
     }

@@ -59,15 +59,15 @@ public class DataRepository implements Repository {
                     public Observable<String> call(String userId) {
                         return networkDataSource.createGroupOnMicrosoftFaceAPI(userId);
                     }
-                }).flatMap(new Func1<String, Observable<Void>>() {
+                }).flatMap(new Func1<String, Observable<Boolean>>() {
                     @Override
-                    public Observable<Void> call(String s) {
+                    public Observable<Boolean> call(String s) {
                         return firebaseDataSource.saveMicrosoftGroupId();
                     }
                 })
-                .flatMap(new Func1<Void, Observable<Boolean>>() {
+                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(Void aVoid) {
+                    public Observable<Boolean> call(Boolean aBoolean) {
                         return firebaseDataSource.hasMicrosoftId();
                     }
                 }).filter((aBoolean1) -> !aBoolean1)
