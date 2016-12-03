@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -14,6 +15,7 @@ import com.nosmurf.shk.internal.di.component.DaggerMainComponent;
 import com.nosmurf.shk.internal.di.component.MainComponent;
 import com.nosmurf.shk.presenter.MainPresenter;
 import com.nosmurf.shk.presenter.Presenter;
+import com.nosmurf.shk.utils.AnimationUtils;
 
 import javax.inject.Inject;
 
@@ -38,6 +40,9 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Bind(R.id.camera)
     FloatingActionButton camera;
+
+    @Bind(R.id.fingerprint)
+    RelativeLayout fingerPrint;
 
     public static Intent getCallingIntent(RootActivity rootActivity) {
         return new Intent(rootActivity, MainActivity.class);
@@ -118,6 +123,23 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     public void showImage(Bitmap bitmap) {
         // TODO: 01/12/2016 Show Photo
+    }
+
+    @Override
+    public void showNormalUI() {
+        fingerPrint.setVisibility(View.INVISIBLE);
+        camera.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showFingerPrintSuccess() {
+        AnimationUtils.exitReveal(fingerPrint);
+        camera.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showFingerPrintError() {
+        fingerPrint.setBackgroundColor(ContextCompat.getColor(this, R.color.red_500));
     }
 
     public Context getContext() {
