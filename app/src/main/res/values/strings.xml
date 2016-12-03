@@ -17,5 +17,7 @@
     <string name="error_format_tag">Error authenticating tag, please, do factory format</string>
     <string name="try_again">Try again please</string>
     <string name="fingerprint_found">Please, put your fingerprint</string>
+    <string name="email_text">Insert the Owner ID</string>
+    <string name="email_description">If you are not the Owner, please, set this, else ignore this field</string>
 
 </resources>

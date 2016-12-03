@@ -69,7 +69,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
-                doLoginUseCase.execute(account, new PresenterSubscriber<Void>() {
+                doLoginUseCase.execute(account, view.getEmail(), new PresenterSubscriber<Void>() {
                     @Override
                     public void onCompleted() {
                         view.hideProgress();
@@ -119,6 +119,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
         void showCompletedUI();
 
         void toggleSignInButton(boolean show);
+
+        String getEmail();
 
         void showFingerPrintDialog(FingerPrintDialog.OnFingerPrintDialogListener onFingerPrintDialogListener);
     }
