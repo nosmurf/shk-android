@@ -10,7 +10,7 @@ public interface Repository {
 
     Observable<Void> uploadPhoto(String imagePath);
 
-    Observable<Void> doLogin(GoogleSignInAccount account);
+    Observable<Void> doLogin(GoogleSignInAccount account, String parentEmail);
 
     Observable<TokenHashed> getHashedToken();
 

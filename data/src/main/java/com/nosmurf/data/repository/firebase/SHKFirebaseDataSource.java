@@ -22,6 +22,9 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -92,7 +95,7 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
 
     @Override
-    public Observable<Boolean> doLogin(GoogleSignInAccount account) {
+    public Observable<Boolean> doLogin(GoogleSignInAccount account, String parentEmail) {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
@@ -100,13 +103,36 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 firebaseAuth.signInWithCredential(credential)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                subscriber.onNext(true);
                                 String uid = firebaseAuth.getCurrentUser().getUid();
-                                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
-                                groupsReference.child(USERS_PATH).setValue(uid);
-                                groupsReference.child(USERS_PATH).child(uid).child("role").setValue("admin");
-                                groupsReference.child(USERS_PATH).child(uid).child("name").setValue(account.getDisplayName());
-                                groupsReference.child(USERS_PATH).child(uid).child("email").setValue(account.getEmail());
+                                String parentUid = uid;
+                                if (!parentEmail.equals("")) {
+                                    DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH);
+                                    groupsReference.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Map<String, Object> groups = (HashMap<String, Object>) dataSnapshot.getValue();
+
+                                            Iterator it = groups.entrySet().iterator();
+                                            while (it.hasNext()) {
+                                                Map.Entry pair = (Map.Entry) it.next();
+                                                String key = (String) pair.getKey();
+                                                Map<String, Object> value = (HashMap<String, Object>) pair.getValue();
+                                                if (value.get("parentEmail").equals(parentEmail)) {
+                                                    insertUser(account, key, uid, "user", subscriber);
+                                                }
+                                                it.remove(); // avoids a ConcurrentModificationException
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            subscriber.onError(databaseError.toException());
+                                        }
+                                    });
+                                } else {
+                                    insertUser(account, parentUid, uid, "admin", subscriber);
+                                }
+
                                 subscriber.onCompleted();
                             } else {
                                 subscriber.onError(task.getException());
@@ -114,6 +140,20 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                         });
             }
         });
+    }
+
+    private void insertUser(GoogleSignInAccount account, String parentUid, String uid, String role, Subscriber<? super Boolean> subscriber) {
+        DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + parentUid);
+        if (parentUid.equals(uid)) {
+            groupsReference.child("parentEmail").setValue(account.getEmail());
+            groupsReference.child(USERS_PATH).setValue(parentUid);
+        }
+
+        groupsReference.child(USERS_PATH).child(uid).child("role").setValue(role);
+        groupsReference.child(USERS_PATH).child(uid).child("name").setValue(account.getDisplayName());
+        groupsReference.child(USERS_PATH).child(uid).child("email").setValue(account.getEmail());
+        subscriber.onNext(true);
+        subscriber.onCompleted();
     }
 
     @Override

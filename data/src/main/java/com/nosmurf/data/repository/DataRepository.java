@@ -39,15 +39,14 @@ public class DataRepository implements Repository {
     }
 
     @Override
-    public Observable<Void> doLogin(GoogleSignInAccount account) {
+    public Observable<Void> doLogin(GoogleSignInAccount account, String parentEmail) {
 
-        return firebaseDataSource.doLogin(account)
-                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> call(Boolean aBoolean) {
-                        return firebaseDataSource.hasGroupOnMicrosoft();
-                    }
-                })
+        return firebaseDataSource.doLogin(account, parentEmail).flatMap(new Func1<Boolean, Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call(Boolean aBoolean) {
+                return firebaseDataSource.hasGroupOnMicrosoft();
+            }
+        })
                 .filter((hasGroup) -> !hasGroup)
                 .flatMap(new Func1<Boolean, Observable<String>>() {
                     @Override

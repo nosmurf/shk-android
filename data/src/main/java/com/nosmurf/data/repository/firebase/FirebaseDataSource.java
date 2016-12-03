@@ -10,7 +10,7 @@ public interface FirebaseDataSource {
 
     Observable<String> uploadPhoto(String imagePath);
 
-    Observable<Boolean> doLogin(GoogleSignInAccount account);
+    Observable<Boolean> doLogin(GoogleSignInAccount account, String parentEmail);
 
     Observable<String> getCurrentUser();
 

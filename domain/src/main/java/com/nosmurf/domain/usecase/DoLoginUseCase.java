@@ -36,6 +36,6 @@ public class DoLoginUseCase extends UseCase {
 
     @Override
     protected Observable getObservable() {
-        return repository.doLogin(account);
+        return repository.doLogin(account, parentEmail);
     }
 }
