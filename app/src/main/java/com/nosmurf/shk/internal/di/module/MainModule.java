@@ -1,5 +1,6 @@
 package com.nosmurf.shk.internal.di.module;
 
+import com.nosmurf.domain.usecase.GetAccessUserCase;
 import com.nosmurf.domain.usecase.UploadPhotoUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.internal.di.PerActivity;
@@ -17,6 +18,13 @@ public class MainModule {
     @Named("uploadPhotoUseCase")
     UseCase provideUploadPhotoUseCase(UploadPhotoUseCase uploadPhotoUseCase) {
         return uploadPhotoUseCase;
+    }
+
+    @Provides
+    @PerActivity
+    @Named("getAccessUserCase")
+    UseCase provideGetAccessUserCase(GetAccessUserCase getAccessUserCase) {
+        return getAccessUserCase;
     }
 
 }

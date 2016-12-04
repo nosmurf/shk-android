@@ -7,15 +7,21 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.nosmurf.domain.model.Access;
 import com.nosmurf.shk.R;
 import com.nosmurf.shk.internal.di.component.DaggerMainComponent;
 import com.nosmurf.shk.internal.di.component.MainComponent;
 import com.nosmurf.shk.presenter.MainPresenter;
 import com.nosmurf.shk.presenter.Presenter;
 import com.nosmurf.shk.utils.AnimationUtils;
+import com.nosmurf.shk.view.adapter.AccessAdapter;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -44,6 +50,11 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Bind(R.id.fingerprint)
     RelativeLayout fingerPrint;
 
+    @Bind(R.id.access)
+    RecyclerView access;
+
+    private AccessAdapter accessAdapter;
+
     public static Intent getCallingIntent(RootActivity rootActivity) {
         return new Intent(rootActivity, MainActivity.class);
     }
@@ -69,7 +80,9 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
 
     @Override
     protected void initializeUI() {
-
+        this.accessAdapter = new AccessAdapter();
+        access.setAdapter(accessAdapter);
+        access.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
     }
 
     @Override
@@ -140,6 +153,11 @@ public class MainActivity extends RootActivity implements MainPresenter.View {
     @Override
     public void showFingerPrintError() {
         fingerPrint.setBackgroundColor(ContextCompat.getColor(this, R.color.red_500));
+    }
+
+    @Override
+    public void showAccess(List<Access> accesses) {
+        accessAdapter.addAll(accesses);
     }
 
     public Context getContext() {

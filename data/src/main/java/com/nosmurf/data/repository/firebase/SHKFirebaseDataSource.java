@@ -15,16 +15,22 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.nosmurf.data.exception.UserNotFoundException;
+import com.nosmurf.data.mapper.AccessResponseDtoMapper;
+import com.nosmurf.data.model.AccessDto;
 import com.nosmurf.data.model.PersonReference;
+import com.nosmurf.domain.model.Access;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +40,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class SHKFirebaseDataSource implements FirebaseDataSource {
 
@@ -57,11 +64,14 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     private final DatabaseReference databaseReference;
 
+    private final AccessResponseDtoMapper accessResponseDtoMapper;
+
     @Inject
-    public SHKFirebaseDataSource() {
+    public SHKFirebaseDataSource(AccessResponseDtoMapper accessResponseDtoMapper) {
         storageReference = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        this.accessResponseDtoMapper = accessResponseDtoMapper;
     }
 
     @Override
@@ -320,6 +330,78 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             };
             groupsReference.child("microsoftGroupId").addValueEventListener(valueEventListener);
         });
+    }
+
+    @Override
+    public Observable<List<Access>> getAccess(String groupId) {
+        return Observable.create(new Observable.OnSubscribe<List<AccessDto>>() {
+            @Override
+            public void call(Subscriber<? super List<AccessDto>> subscriber) {
+                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + groupId);
+                groupsReference.child("accesses").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<AccessDto> accessDtos = new ArrayList<>();
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            AccessDto accessDto = postSnapshot.getValue(AccessDto.class);
+                            accessDtos.add(accessDto);
+                        }
+
+                        subscriber.onNext(accessDtos);
+                        subscriber.onCompleted();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        subscriber.onError(databaseError.toException());
+                    }
+                });
+            }
+        }).flatMapIterable(new Func1<List<AccessDto>, Iterable<AccessDto>>() {
+            @Override
+            public Iterable<AccessDto> call(List<AccessDto> accessDtos) {
+                return accessDtos;
+            }
+        }).flatMap(new Func1<AccessDto, Observable<Access>>() {
+                       @Override
+                       public Observable<Access> call(AccessDto accessDto) {
+                           return Observable.create(subscriber -> {
+                               DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + groupId);
+                               DatabaseReference name = groupReference.child(USERS_PATH + accessDto.getUid()).child("name");
+                               name.addValueEventListener(new ValueEventListener() {
+                                   @Override
+                                   public void onDataChange(DataSnapshot dataSnapshot) {
+                                       if (dataSnapshot != null) {
+                                           String displayName = dataSnapshot.getValue(String.class);
+                                           name.removeEventListener(this);
+                                           subscriber.onNext(new Access(displayName, new Date(accessDto.getDatetime()), accessDto.isNfc(), accessDto.isFace()));
+                                           subscriber.onCompleted();
+
+                                       } else {
+                                           subscriber.onError(new RuntimeException());
+                                       }
+                                   }
+
+                                   @Override
+                                   public void onCancelled(DatabaseError databaseError) {
+                                       subscriber.onError(databaseError.toException());
+                                   }
+                               });
+                           });
+                       }
+                   }
+        ).toSortedList(new Func2<Access, Access, Integer>() {
+            @Override
+            public Integer call(Access access, Access access2) {
+                if (access.getDate().getTime() > access2.getDate().getTime()) {
+                    return -1;
+                } else if (access.getDate().getTime() == access2.getDate().getTime()) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        }).repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS));
     }
 
     private String getRandomHexString() {

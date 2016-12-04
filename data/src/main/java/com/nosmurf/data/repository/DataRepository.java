@@ -6,10 +6,12 @@ import com.nosmurf.data.model.PersonReference;
 import com.nosmurf.data.repository.firebase.FirebaseDataSource;
 import com.nosmurf.data.repository.network.NetworkDataSource;
 import com.nosmurf.data.repository.persistence.PersistenceDataSource;
+import com.nosmurf.domain.model.Access;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 import com.nosmurf.domain.repository.Repository;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -89,5 +91,10 @@ public class DataRepository implements Repository {
     public Observable<Boolean> hasCurrentUser() {
         return firebaseDataSource.hasCurrentUser()
                 .delay(500, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public Observable<List<Access>> getAccess() {
+        return firebaseDataSource.getAccess(persistenceDataSource.getHomeId());
     }
 }

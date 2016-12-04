@@ -2,8 +2,11 @@ package com.nosmurf.data.repository.firebase;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.nosmurf.data.model.PersonReference;
+import com.nosmurf.domain.model.Access;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
+
+import java.util.List;
 
 import rx.Observable;
 
@@ -32,4 +35,6 @@ public interface FirebaseDataSource {
     Observable<String> saveMicrosoftGroupId();
 
     Observable<Boolean> hasGroupOnMicrosoft(String uid);
+
+    Observable<List<Access>> getAccess(String groupId);
 }

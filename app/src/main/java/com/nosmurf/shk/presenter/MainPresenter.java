@@ -9,6 +9,8 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.nosmurf.domain.model.Access;
+import com.nosmurf.domain.usecase.GetAccessUserCase;
 import com.nosmurf.domain.usecase.UploadPhotoUseCase;
 import com.nosmurf.domain.usecase.UseCase;
 import com.nosmurf.shk.exception.ExceptionManager;
@@ -31,13 +33,17 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
     private final UploadPhotoUseCase uploadPhotoUseCase;
 
+    private final GetAccessUserCase getAccessUserCase;
+
     private String photoPath;
 
     private FingerprintAuthHelper fingerprintAuthHelper;
 
     @Inject
-    public MainPresenter(@Named("uploadPhotoUseCase") UseCase uploadPhotoUseCase) {
+    public MainPresenter(@Named("uploadPhotoUseCase") UseCase uploadPhotoUseCase,
+                         @Named("getAccessUserCase") UseCase getAccessUserCase) {
         this.uploadPhotoUseCase = (UploadPhotoUseCase) uploadPhotoUseCase;
+        this.getAccessUserCase = (GetAccessUserCase) getAccessUserCase;
     }
 
     @Override
@@ -45,10 +51,13 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         fingerprintAuthHelper = new FingerprintAuthHelper
                 .Builder(view.getContext(),
                 new FahListener() {
+
+
                     @Override
                     public void onFingerprintStatus(boolean authSuccessful, int errorType, @NotNull CharSequence charSequence) {
                         if (authSuccessful) {
                             view.showFingerPrintSuccess();
+                            getAccess();
                         } else if (fingerprintAuthHelper != null) {
                             // do some stuff here in case auth failed
                             switch (errorType) {
@@ -66,6 +75,7 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
                         }
                     }
 
+
                     @Override
                     public void onFingerprintListening(boolean b, long l) {
                         // Nothing to do
@@ -75,13 +85,20 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         if (fingerprintAuthHelper.isFingerprintEnrolled()) {
             fingerprintAuthHelper.startListening();
         } else {
+            getAccess();
             view.showNormalUI();
         }
     }
 
+    private void getAccess() {
+        view.showProgress(null);
+        getAccessUserCase.execute(new GetAccessSubscriber());
+    }
+
     @Override
     public void destroy() {
-
+        getAccessUserCase.unsubscribe();
+        uploadPhotoUseCase.unsubscribe();
     }
 
     public void takeAPhoto(int requestImageCapture) {
@@ -102,7 +119,7 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
 
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-
+                        view.showError("You must accept the permissions");
                     }
                 }, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA);
     }
@@ -122,6 +139,23 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         void showFingerPrintSuccess();
 
         void showFingerPrintError();
+
+        void showAccess(List<Access> access);
+    }
+
+    private class GetAccessSubscriber extends PresenterSubscriber<List<Access>> {
+
+        @Override
+        public void onCompleted() {
+            view.hideProgress();
+        }
+
+        @Override
+        public void onNext(List<Access> accesses) {
+            view.showAccess(accesses);
+            view.hideProgress();
+        }
+
     }
 
     private class UploadPhotoSubscriber extends PresenterSubscriber<Void> {

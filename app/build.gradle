@@ -43,6 +43,7 @@ dependencies {
 
     compile appDependencies.appcompat
     compile appDependencies.recycler
+    compile appDependencies.cardView
     compile appDependencies.design
     compile appDependencies.support
 
@@ -51,6 +52,8 @@ dependencies {
     compile appDependencies.butterKnife
 
     compile appDependencies.dexter
+
+    compile appDependencies.extendedRecycler
 
     compile appDependencies.rxJava
     compile appDependencies.rxAndroid
