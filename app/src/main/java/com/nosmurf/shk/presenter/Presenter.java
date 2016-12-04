@@ -51,6 +51,7 @@ public abstract class Presenter<T extends Presenter.View> {
             view.showError(ExceptionManager.convert((Exception) e));
             view.hideProgress();
         }
+        
     }
 
 }

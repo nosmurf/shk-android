@@ -15,13 +15,23 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.nosmurf.data.exception.UserNotFoundException;
+import com.nosmurf.data.mapper.AccessResponseDtoMapper;
+import com.nosmurf.data.model.AccessDto;
+import com.nosmurf.data.model.PersonReference;
+import com.nosmurf.domain.model.Access;
 import com.nosmurf.domain.model.Key;
 import com.nosmurf.domain.model.TokenHashed;
 
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -30,14 +40,17 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     public static final String TAG = "FirebaseDatabaseSource";
 
+    private static final String GROUP_ID = "";
+
     private static final String GROUPS_PATH = "groups/";
 
-    private static final String IMAGES = "IMAGES";
+    private static final String IMAGES = "images";
 
     private static final String ALGORITHM = "SHA-384";
 
@@ -51,35 +64,41 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     private final DatabaseReference databaseReference;
 
+    private final AccessResponseDtoMapper accessResponseDtoMapper;
 
     @Inject
-    public SHKFirebaseDataSource() {
+    public SHKFirebaseDataSource(AccessResponseDtoMapper accessResponseDtoMapper) {
         storageReference = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        this.accessResponseDtoMapper = accessResponseDtoMapper;
     }
 
     @Override
-    public Observable<Void> uploadPhoto(String imagePath) {
-        File image = new File(imagePath);
-        Uri uri = Uri.fromFile(image);
-
-        final StorageReference userPhotosRef = storageReference.child(firebaseAuth.getCurrentUser().getUid()).child(uri.getLastPathSegment());
-
+    public Observable<String> uploadPhoto(String homeId, String imagePath) {
+        String userId = firebaseAuth.getCurrentUser().getUid();
         return Observable.create((Subscriber<? super Uri> subscriber) -> {
-            userPhotosRef.putFile(uri)
+
+            File image = new File(imagePath);
+            Uri uri = Uri.fromFile(image);
+
+            StorageReference groupStorageReference = storageReference.child(GROUP_ID + homeId);
+            StorageReference userStorageReference = groupStorageReference.child(USERS_PATH + userId).child(uri.getLastPathSegment());
+            userStorageReference.putFile(uri)
                     .addOnSuccessListener(task -> {
                         subscriber.onNext(task.getDownloadUrl());
                         subscriber.onCompleted();
                     })
                     .addOnFailureListener(subscriber::onError);
-        }).flatMap(new Func1<Uri, Observable<Void>>() {
+        }).flatMap(new Func1<Uri, Observable<String>>() {
             @Override
-            public Observable<Void> call(Uri uri) {
-                return Observable.create((Subscriber<? super Void> subscriber) -> {
-                    DatabaseReference usersReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
-                    usersReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
+            public Observable<String> call(Uri uri) {
+                return Observable.create((Subscriber<? super String> subscriber) -> {
+                    DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + homeId);
+                    DatabaseReference userReference = groupsReference.child(USERS_PATH + userId);
+                    userReference.child(IMAGES).push().setValue(uri.toString()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            subscriber.onNext(uri.toString());
                             subscriber.onCompleted();
                         }
                     }).addOnFailureListener(subscriber::onError);
@@ -91,20 +110,137 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
 
     @Override
-    public Observable<Void> doLogin(GoogleSignInAccount account) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+    public Observable<String> doLogin(GoogleSignInAccount account, String parentEmail) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(Subscriber<? super String> subscriber) {
                 AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
                 firebaseAuth.signInWithCredential(credential)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                subscriber.onCompleted();
+                                String uid = firebaseAuth.getCurrentUser().getUid();
+                                String parentUid = uid;
+                                if (!parentEmail.equals("")) {
+                                    DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH);
+                                    groupsReference.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Map<String, Object> groups = (HashMap<String, Object>) dataSnapshot.getValue();
+
+                                            Iterator it = groups.entrySet().iterator();
+                                            while (it.hasNext()) {
+                                                Map.Entry pair = (Map.Entry) it.next();
+                                                String key = (String) pair.getKey();
+                                                Map<String, Object> value = (HashMap<String, Object>) pair.getValue();
+                                                if (value.get("parentEmail").equals(parentEmail)) {
+                                                    groupsReference.removeEventListener(this);
+                                                    insertUser(account, key, uid, "user", subscriber);
+                                                }
+                                                it.remove(); // avoids a ConcurrentModificationException
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            subscriber.onError(databaseError.toException());
+                                        }
+                                    });
+                                } else {
+                                    insertUser(account, parentUid, uid, "admin", subscriber);
+                                }
                             } else {
                                 subscriber.onError(task.getException());
                             }
                         });
             }
+        });
+    }
+
+    private void insertUser(GoogleSignInAccount account, String parentUid, String uid, String role, Subscriber<? super String> subscriber) {
+        DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + parentUid);
+        if (parentUid.equals(uid)) {
+            groupsReference.child("parentEmail").setValue(account.getEmail());
+            groupsReference.child(USERS_PATH).setValue(parentUid);
+        }
+
+        groupsReference.child(USERS_PATH).child(uid).child("role").setValue(role);
+        groupsReference.child(USERS_PATH).child(uid).child("name").setValue(account.getDisplayName());
+        groupsReference.child(USERS_PATH).child(uid).child("email").setValue(account.getEmail());
+        subscriber.onNext(parentUid);
+        subscriber.onCompleted();
+    }
+
+    @Override
+    public Observable<Boolean> hasCurrentUser() {
+        return Observable.just(firebaseAuth.getCurrentUser() != null);
+    }
+
+    @Override
+    public Observable<String> getGroupId(String uid) {
+        return Observable.create(subscriber -> {
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + uid);
+            groupReference.child("microsoftGroupId").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    subscriber.onNext(dataSnapshot.getValue(String.class));
+                    subscriber.onCompleted();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    subscriber.onError(databaseError.toException());
+                }
+            });
+        });
+    }
+
+    @Override
+    public Observable<String> getPersonId(String groupId) {
+        return Observable.create(subscriber -> {
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + groupId);
+            DatabaseReference userReference = groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+            userReference.child("microsoftId").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    subscriber.onNext(dataSnapshot.getValue(String.class));
+                    subscriber.onCompleted();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    subscriber.onError(databaseError.toException());
+                }
+            });
+        });
+    }
+
+    @Override
+    public Observable<Boolean> hasMicrosoftId() {
+        return Observable.create(subscriber -> {
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + firebaseAuth.getCurrentUser().getUid());
+            groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid()).child("microsoftId")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            subscriber.onNext(dataSnapshot.getValue(String.class) != null);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            subscriber.onError(databaseError.toException());
+                        }
+                    });
+        });
+    }
+
+    @Override
+    public Observable<Void> saveMicrosoftId(PersonReference personReference) {
+        return Observable.create(subscriber -> {
+            DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + personReference.getGroupId());
+            DatabaseReference userReference = groupReference.child(USERS_PATH + firebaseAuth.getCurrentUser().getUid());
+            userReference.child("microsoftId")
+                    .setValue(personReference.getMicrosoftId())
+                    .addOnCompleteListener(task -> subscriber.onCompleted());
         });
     }
 
@@ -119,9 +255,10 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 }
 
                 // FIXME: 01/12/2016 remove hardcoded numbers
-                subscriber.onNext(new TokenHashed(16, Arrays.copyOfRange(messageDigest.digest(), 0, 16)));
-                subscriber.onNext(new TokenHashed(17, Arrays.copyOfRange(messageDigest.digest(), 16, 32)));
-                subscriber.onNext(new TokenHashed(18, Arrays.copyOfRange(messageDigest.digest(), 32, 48)));
+                byte[] digest = messageDigest.digest();
+                subscriber.onNext(new TokenHashed(16, Arrays.copyOfRange(digest, 0, 16)));
+                subscriber.onNext(new TokenHashed(17, Arrays.copyOfRange(digest, 16, 32)));
+                subscriber.onNext(new TokenHashed(18, Arrays.copyOfRange(digest, 32, 48)));
 
                 subscriber.onCompleted();
 
@@ -133,22 +270,24 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Key> getKey() {
+    public Observable<Key> getKey(String parentUid) {
         return Observable.create(new Observable.OnSubscribe<Key>() {
             @Override
             public void call(Subscriber<? super Key> subscriber) {
                 String uid = firebaseAuth.getCurrentUser().getUid();
-                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
-                groupsReference.child(KEY).addValueEventListener(new ValueEventListener() {
+                if (!parentUid.equals(uid)) {
+                    uid = parentUid;
+                }
+                DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + uid);
+                groupReference.child(KEY).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Object value = dataSnapshot.getValue();
                         if (value == null) {
-                            groupsReference.child(KEY).setValue(getRandomHexString());
-                            groupsReference.child(USERS_PATH).setValue(uid);
-                            groupsReference.child(USERS_PATH).child(uid).child("role").setValue("admin");
+                            groupReference.child(KEY).setValue(getRandomHexString());
                         } else {
                             subscriber.onNext(new Key(4, 19, (String) value));
+                            groupReference.child(KEY).removeEventListener(this);
                             subscriber.onCompleted();
                         }
                     }
@@ -163,6 +302,113 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         });
     }
 
+    @Override
+    public Observable<String> saveMicrosoftGroupId() {
+        String uid = firebaseAuth.getCurrentUser().getUid();
+        DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + uid);
+        return Observable.create(subscriber -> {
+            groupReference.child("microsoftGroupId").setValue(uid).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    subscriber.onNext(uid);
+                    subscriber.onCompleted();
+                }
+            }).addOnFailureListener(subscriber::onError);
+        });
+    }
+
+    @Override
+    public Observable<Boolean> hasGroupOnMicrosoft(String uid) {
+        return Observable.create(subscriber -> {
+            DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
+            ValueEventListener valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    groupsReference.removeEventListener(this);
+                    subscriber.onNext(dataSnapshot.getValue(String.class) != null);
+                    subscriber.onCompleted();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    subscriber.onError(databaseError.toException());
+                }
+            };
+            groupsReference.child("microsoftGroupId").addValueEventListener(valueEventListener);
+        });
+    }
+
+    @Override
+    public Observable<List<Access>> getAccess(String groupId) {
+        return Observable.create(new Observable.OnSubscribe<List<AccessDto>>() {
+            @Override
+            public void call(Subscriber<? super List<AccessDto>> subscriber) {
+                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + groupId);
+                groupsReference.child("accesses").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<AccessDto> accessDtos = new ArrayList<>();
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            AccessDto accessDto = postSnapshot.getValue(AccessDto.class);
+                            accessDtos.add(accessDto);
+                        }
+
+                        subscriber.onNext(accessDtos);
+                        subscriber.onCompleted();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        subscriber.onError(databaseError.toException());
+                    }
+                });
+            }
+        }).flatMapIterable(new Func1<List<AccessDto>, Iterable<AccessDto>>() {
+            @Override
+            public Iterable<AccessDto> call(List<AccessDto> accessDtos) {
+                return accessDtos;
+            }
+        }).flatMap(new Func1<AccessDto, Observable<Access>>() {
+                       @Override
+                       public Observable<Access> call(AccessDto accessDto) {
+                           return Observable.create(subscriber -> {
+                               DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + groupId);
+                               DatabaseReference name = groupReference.child(USERS_PATH + accessDto.getUid()).child("name");
+                               name.addValueEventListener(new ValueEventListener() {
+                                   @Override
+                                   public void onDataChange(DataSnapshot dataSnapshot) {
+                                       if (dataSnapshot != null) {
+                                           String displayName = dataSnapshot.getValue(String.class);
+                                           name.removeEventListener(this);
+                                           subscriber.onNext(new Access(displayName, new Date(accessDto.getDatetime()), accessDto.isNfc(), accessDto.isFace()));
+                                           subscriber.onCompleted();
+
+                                       } else {
+                                           subscriber.onError(new RuntimeException());
+                                       }
+                                   }
+
+                                   @Override
+                                   public void onCancelled(DatabaseError databaseError) {
+                                       subscriber.onError(databaseError.toException());
+                                   }
+                               });
+                           });
+                       }
+                   }
+        ).toSortedList(new Func2<Access, Access, Integer>() {
+            @Override
+            public Integer call(Access access, Access access2) {
+                if (access.getDate().getTime() > access2.getDate().getTime()) {
+                    return -1;
+                } else if (access.getDate().getTime() == access2.getDate().getTime()) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        }).repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS));
+    }
+
     private String getRandomHexString() {
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
@@ -174,10 +420,6 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
         return sb.toString().substring(0, nBytes);
     }
 
-    public Observable<Boolean> hasCurrentUser() {
-        return Observable.just(firebaseAuth.getCurrentUser() != null);
-    }
-
     @Override
     public Observable<String> getCurrentUser() {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
@@ -187,4 +429,5 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
             return Observable.error(new UserNotFoundException());
         }
     }
+
 }

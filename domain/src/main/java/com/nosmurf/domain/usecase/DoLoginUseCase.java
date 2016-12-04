@@ -19,20 +19,23 @@ public class DoLoginUseCase extends UseCase {
 
     private GoogleSignInAccount account;
 
+    private String parentEmail;
+
     @Inject
     public DoLoginUseCase(Repository repository, PostExecutionThread postExecutionThread) {
         super(postExecutionThread);
         this.repository = repository;
     }
 
-    public void execute(GoogleSignInAccount account, Subscriber<Void> subscriber){
+    public void execute(GoogleSignInAccount account, String parentEmail, Subscriber<Void> subscriber) {
         this.account = account;
+        this.parentEmail = parentEmail;
 
         super.execute(subscriber);
     }
 
     @Override
     protected Observable getObservable() {
-        return repository.doLogin(account);
+        return repository.doLogin(account, parentEmail);
     }
 }

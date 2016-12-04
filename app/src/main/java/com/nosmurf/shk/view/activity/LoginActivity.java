@@ -8,7 +8,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.SignInButton;
@@ -20,7 +22,6 @@ import com.nosmurf.shk.presenter.LoginPresenter;
 import com.nosmurf.shk.presenter.Presenter;
 import com.nosmurf.shk.utils.AnimationUtils;
 import com.nosmurf.shk.view.FingerPrintDialog;
-import com.pro100svitlo.fingerprintAuthHelper.FingerprintAuthHelper;
 
 import javax.inject.Inject;
 
@@ -52,6 +53,12 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
 
     @Bind(R.id.reveal)
     View reveal;
+
+    @Bind(R.id.email)
+    EditText email;
+
+    @Bind(R.id.image_container)
+    LinearLayout emailContainer;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -149,6 +156,8 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
     public void showCompletedUI() {
         hideProgress();
 
+        emailContainer.setVisibility(View.GONE);
+
         AnimationUtils.enterReveal(reveal, () -> {
             done.setVisibility(View.VISIBLE);
             continueButton.setVisibility(View.VISIBLE);
@@ -170,5 +179,10 @@ public class LoginActivity extends RootActivity implements LoginPresenter.View {
         dialog.setParams(onFingerPrintDialogListener);
         dialog.show(getSupportFragmentManager(), "fragment_container");
 
+    }
+
+    @Override
+    public String getEmail() {
+        return email.getText().toString();
     }
 }

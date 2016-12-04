@@ -40,7 +40,11 @@ dependencies {
     compile dataDependencies.retrofit
     compile dataDependencies.gsonRetrofit
     compile dataDependencies.rxRetrofit
+    compile appDependencies.rxAndroid
     compile dataDependencies.gson
+
+    compile dataDependencies.okHttp
+    compile dataDependencies.okHttpLog
 
     compile dataDependencies.firebaseStorage
     compile dataDependencies.firebaseAuth
