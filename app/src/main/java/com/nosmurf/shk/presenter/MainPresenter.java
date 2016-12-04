@@ -51,8 +51,6 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
         fingerprintAuthHelper = new FingerprintAuthHelper
                 .Builder(view.getContext(),
                 new FahListener() {
-
-
                     @Override
                     public void onFingerprintStatus(boolean authSuccessful, int errorType, @NotNull CharSequence charSequence) {
                         if (authSuccessful) {
