@@ -76,14 +76,14 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     @Override
     public Observable<String> uploadPhoto(String homeId, String imagePath) {
-        File image = new File(imagePath);
-        Uri uri = Uri.fromFile(image);
-
         String userId = firebaseAuth.getCurrentUser().getUid();
-
-        final StorageReference groupStorageReference = storageReference.child(GROUP_ID + homeId);
-        final StorageReference userStorageReference = groupStorageReference.child(USERS_PATH + userId).child(uri.getLastPathSegment());
         return Observable.create((Subscriber<? super Uri> subscriber) -> {
+
+            File image = new File(imagePath);
+            Uri uri = Uri.fromFile(image);
+
+            StorageReference groupStorageReference = storageReference.child(GROUP_ID + homeId);
+            StorageReference userStorageReference = groupStorageReference.child(USERS_PATH + userId).child(uri.getLastPathSegment());
             userStorageReference.putFile(uri)
                     .addOnSuccessListener(task -> {
                         subscriber.onNext(task.getDownloadUrl());
@@ -255,9 +255,10 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
                 }
 
                 // FIXME: 01/12/2016 remove hardcoded numbers
-                subscriber.onNext(new TokenHashed(16, Arrays.copyOfRange(messageDigest.digest(), 0, 16)));
-                subscriber.onNext(new TokenHashed(17, Arrays.copyOfRange(messageDigest.digest(), 16, 32)));
-                subscriber.onNext(new TokenHashed(18, Arrays.copyOfRange(messageDigest.digest(), 32, 48)));
+                byte[] digest = messageDigest.digest();
+                subscriber.onNext(new TokenHashed(16, Arrays.copyOfRange(digest, 0, 16)));
+                subscriber.onNext(new TokenHashed(17, Arrays.copyOfRange(digest, 16, 32)));
+                subscriber.onNext(new TokenHashed(18, Arrays.copyOfRange(digest, 32, 48)));
 
                 subscriber.onCompleted();
 
@@ -269,20 +270,24 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
     }
 
     @Override
-    public Observable<Key> getKey() {
+    public Observable<Key> getKey(String parentUid) {
         return Observable.create(new Observable.OnSubscribe<Key>() {
             @Override
             public void call(Subscriber<? super Key> subscriber) {
                 String uid = firebaseAuth.getCurrentUser().getUid();
-                DatabaseReference groupsReference = databaseReference.child(GROUPS_PATH + uid);
-                groupsReference.child(KEY).addValueEventListener(new ValueEventListener() {
+                if (!parentUid.equals(uid)) {
+                    uid = parentUid;
+                }
+                DatabaseReference groupReference = databaseReference.child(GROUPS_PATH + uid);
+                groupReference.child(KEY).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Object value = dataSnapshot.getValue();
                         if (value == null) {
-                            groupsReference.child(KEY).setValue(getRandomHexString());
+                            groupReference.child(KEY).setValue(getRandomHexString());
                         } else {
                             subscriber.onNext(new Key(4, 19, (String) value));
+                            groupReference.child(KEY).removeEventListener(this);
                             subscriber.onCompleted();
                         }
                     }

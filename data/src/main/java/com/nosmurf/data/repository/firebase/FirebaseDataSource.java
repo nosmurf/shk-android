@@ -30,7 +30,7 @@ public interface FirebaseDataSource {
 
     Observable<TokenHashed> getHashedToken();
 
-    Observable<Key> getKey();
+    Observable<Key> getKey(String parentId);
 
     Observable<String> saveMicrosoftGroupId();
 
