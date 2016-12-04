@@ -66,14 +66,14 @@ public class SHKFirebaseDataSource implements FirebaseDataSource {
 
     @Override
     public Observable<String> uploadPhoto(String homeId, String imagePath) {
-        File image = new File(imagePath);
-        Uri uri = Uri.fromFile(image);
-
         String userId = firebaseAuth.getCurrentUser().getUid();
-
-        final StorageReference groupStorageReference = storageReference.child(GROUP_ID + homeId);
-        final StorageReference userStorageReference = groupStorageReference.child(USERS_PATH + userId).child(uri.getLastPathSegment());
         return Observable.create((Subscriber<? super Uri> subscriber) -> {
+
+            File image = new File(imagePath);
+            Uri uri = Uri.fromFile(image);
+
+            StorageReference groupStorageReference = storageReference.child(GROUP_ID + homeId);
+            StorageReference userStorageReference = groupStorageReference.child(USERS_PATH + userId).child(uri.getLastPathSegment());
             userStorageReference.putFile(uri)
                     .addOnSuccessListener(task -> {
                         subscriber.onNext(task.getDownloadUrl());
