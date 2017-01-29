@@ -1,15 +1,16 @@
 package com.nosmurf.shk.navigation;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
-
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
+
 import com.nosmurf.shk.view.activity.LoginActivity;
 import com.nosmurf.shk.view.activity.MainActivity;
 import com.nosmurf.shk.view.activity.NfcActivity;
 import com.nosmurf.shk.view.activity.RootActivity;
+
+import android.content.Intent;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 
 import java.io.File;
 
@@ -29,7 +30,9 @@ public class Navigator {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null && photoFile != null) {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                    Uri.fromFile(photoFile));
+                    FileProvider.getUriForFile(activity,
+                            "com.nosmurf.shk.fileprovider",
+                            photoFile));
             activity.startActivityForResult(takePictureIntent, requestImageCapture);
         }
     }

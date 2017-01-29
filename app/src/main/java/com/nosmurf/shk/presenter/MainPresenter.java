@@ -3,6 +3,7 @@ package com.nosmurf.shk.presenter;
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -106,7 +107,7 @@ public class MainPresenter extends Presenter<MainPresenter.View> {
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if (report.areAllPermissionsGranted()) {
                             try {
-                                File file = FileUtils.createImageFile();
+                                File file = FileUtils.createImageFile(view.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
                                 photoPath = file.getPath();
                                 navigator.navigateToCameraActivity((RootActivity) view, file, requestImageCapture);
                             } catch (IOException e) {

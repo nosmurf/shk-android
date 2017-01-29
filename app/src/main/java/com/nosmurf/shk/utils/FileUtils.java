@@ -1,7 +1,5 @@
 package com.nosmurf.shk.utils;
 
-import android.os.Environment;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -9,9 +7,7 @@ import java.util.Date;
 
 public class FileUtils {
 
-    public static File createImageFile() throws IOException {
-        final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/shk/";
-        File storageDir = new File(dir);
+    public static File createImageFile(File storageDir) throws IOException {
         storageDir.mkdirs();
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
